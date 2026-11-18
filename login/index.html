@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <canvas id="particleCanvas"></canvas>
+
     <div class="cinematic-frame">
         <header class="top-bar">
             <div class="brand">
@@ -17,8 +19,18 @@
                 </div>
             </div>
             <div class="top-actions">
-                <button type="button" id="btnFallback" class="btn-ghost">Modo Clássico</button>
-                <button type="button" id="btnQuit" class="btn-quit">Sair</button>
+                <button type="button" id="btnAudio" class="btn-audio playing" title="Ligar ou desligar música">
+                    <span class="eq-bars" aria-hidden="true">
+                        <i></i><i></i><i></i>
+                    </span>
+                    <span id="audioLabel">Música: ON</span>
+                </button>
+                <button type="button" id="btnFallback" class="btn-ghost" title="Alternar para interface clássica">
+                    Modo Clássico
+                </button>
+                <button type="button" id="btnQuit" class="btn-quit" title="Desconectar do servidor">
+                    Sair
+                </button>
             </div>
         </header>
 
