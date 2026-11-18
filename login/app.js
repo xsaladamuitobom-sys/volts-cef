@@ -3,7 +3,8 @@
         username: '',
         registered: false,
         loading: false,
-        activeTab: 'login'
+        activeTab: 'login',
+        audioPlaying: true
     };
 
     const el = {
@@ -18,6 +19,8 @@
         regPasswordConfirm: document.getElementById('regPasswordConfirm'),
         btnSubmitLogin: document.getElementById('btnSubmitLogin'),
         btnSubmitRegister: document.getElementById('btnSubmitRegister'),
+        btnAudio: document.getElementById('btnAudio'),
+        audioLabel: document.getElementById('audioLabel'),
         btnQuit: document.getElementById('btnQuit'),
         btnFallback: document.getElementById('btnFallback'),
         feedbackBox: document.getElementById('feedbackBox'),
@@ -31,6 +34,49 @@
         if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
             cef.emit(eventName, String(payload));
         }
+    }
+
+    function initParticles() {
+        const canvas = document.getElementById('particleCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const particles = Array.from({ length: 38 }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: Math.random() * 2 + 0.8,
+            vx: (Math.random() - 0.5) * 0.35,
+            vy: -Math.random() * 0.45 - 0.15,
+            alpha: Math.random() * 0.5 + 0.2
+        }));
+
+        function render() {
+            ctx.clearRect(0, 0, width, height);
+            for (const p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.y < -10) {
+                    p.y = height + 10;
+                    p.x = Math.random() * width;
+                }
+                if (p.x < -10) p.x = width + 10;
+                if (p.x > width + 10) p.x = -10;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 229, 255, ${p.alpha})`;
+                ctx.fill();
+            }
+            requestAnimationFrame(render);
+        }
+        render();
     }
 
     function setLoading(isLoading) {
@@ -99,6 +145,13 @@
 
     el.tabLogin.addEventListener('click', () => switchTab('login'));
     el.tabRegister.addEventListener('click', () => switchTab('register'));
+
+    el.btnAudio.addEventListener('click', () => {
+        state.audioPlaying = !state.audioPlaying;
+        el.btnAudio.classList.toggle('playing', state.audioPlaying);
+        el.audioLabel.textContent = state.audioPlaying ? 'Música: ON' : 'Música: OFF';
+        emitToServer('volts:audio', state.audioPlaying ? '1' : '0');
+    });
 
     document.querySelectorAll('.toggle-pass').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -171,4 +224,6 @@
             }
         });
     }
+
+    initParticles();
 })();
