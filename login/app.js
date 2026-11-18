@@ -226,4 +226,5 @@
     }
 
     initParticles();
+    emitToServer('volts:ready', '1');
 })();
