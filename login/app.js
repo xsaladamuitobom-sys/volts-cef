@@ -77,25 +77,50 @@
     function applyDiscordUrl(url) {
         if (!isValidDiscordUrl(url)) return;
         state.discordUrl = url.trim();
-        if (el.discordLink) {
-            el.discordLink.setAttribute('href', state.discordUrl);
+    }
+
+    function copyTextToClipboard(text) {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
         }
+        return Promise.resolve(fallbackCopyText(text));
+    }
+
+    function fallbackCopyText(text) {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        temp.setAttribute('readonly', '');
+        temp.style.position = 'fixed';
+        temp.style.top = '-9999px';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        let copied = false;
+        try {
+            copied = document.execCommand('copy');
+        } catch (_) {
+            copied = false;
+        }
+        document.body.removeChild(temp);
+        return copied;
     }
 
     if (el.discordLink) {
-        applyDiscordUrl(state.discordUrl);
+        el.discordLink.setAttribute('href', '#');
+        el.discordLink.removeAttribute('target');
         el.discordLink.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+
             const targetUrl = isValidDiscordUrl(state.discordUrl)
                 ? state.discordUrl
                 : DEFAULT_DISCORD_INVITE;
 
-            if (typeof cef !== 'undefined' && typeof cef.openUrl === 'function') {
-                cef.openUrl(targetUrl);
-                return;
-            }
+            copyTextToClipboard(targetUrl).then(() => {
+                showFeedback('success', `Discord copiado (${targetUrl})! Cole no seu navegador.`);
+            });
 
-            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+            emitToServer('volts:discord_click', targetUrl);
         });
     }
 
