@@ -20,9 +20,16 @@
     ];
 
     const TIPS = [
-        'Use senhas fortes e não compartilhe seus dados com ninguém.',
+        'Use uma senha forte e nunca informe seus dados a outras pessoas.',
+        'A equipe oficial do VOLTS RP nunca pede sua senha por chat ou mensagem.',
+        'Evite usar a mesma senha de e-mail ou redes sociais na sua conta do jogo.',
         'Clique no ícone do Discord no topo para copiar o convite oficial.',
-        'Ajuste o volume ou troque de faixa no player no canto inferior direito.'
+        'Mantenha o respeito nas interações e siga as regras de roleplay.',
+        'Evite divulgar links suspeitos ou aceitar arquivos de desconhecidos.',
+        'Em caso de dúvida ou denúncia, procure os canais oficiais no Discord.',
+        'Ajuste o volume ou troque de faixa no player no canto inferior direito.',
+        'Confira seu nome de personagem antes de confirmar o cadastro.',
+        'Use senhas com no mínimo 6 caracteres para proteger melhor seu progresso.'
     ];
 
     const state = {
@@ -40,7 +47,6 @@
 
     const el = {
         liveClock: document.getElementById('liveClock'),
-        serverStatusText: document.getElementById('serverStatusText'),
         discordLink: document.getElementById('discordLink'),
         playerBox: document.getElementById('playerBox'),
         btnPrevTrack: document.getElementById('btnPrevTrack'),
@@ -142,9 +148,17 @@
         el.liveClock.textContent = now.toTimeString().slice(0, 8);
     }
 
-    function rotateFooterTip() {
+    function pickRandomTip(initial = false) {
         if (!el.footerTipText || !TIPS.length) return;
-        state.tipIndex = (state.tipIndex + 1) % TIPS.length;
+        if (initial || TIPS.length === 1) {
+            state.tipIndex = Math.floor(Math.random() * TIPS.length);
+        } else {
+            let nextIdx = Math.floor(Math.random() * (TIPS.length - 1));
+            if (nextIdx >= state.tipIndex) {
+                nextIdx += 1;
+            }
+            state.tipIndex = nextIdx;
+        }
         el.footerTipText.textContent = TIPS[state.tipIndex];
     }
 
@@ -514,7 +528,8 @@
 
     updateClock();
     setInterval(updateClock, 1000);
-    setInterval(rotateFooterTip, 7000);
+    pickRandomTip(true);
+    setInterval(() => pickRandomTip(false), 8000);
     applyVolume(35);
     resetAllPasswordInputs();
 
@@ -532,12 +547,6 @@
 
         cef.on('volts:discord', (url) => {
             applyDiscordUrl(url);
-        });
-
-        cef.on('volts:status', (statusLabel) => {
-            if (el.serverStatusText && statusLabel) {
-                el.serverStatusText.textContent = String(statusLabel);
-            }
         });
 
         cef.on('volts:feedback', (type, message) => {
