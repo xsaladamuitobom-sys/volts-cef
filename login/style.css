@@ -65,7 +65,7 @@ html, body {
         linear-gradient(180deg, rgba(10, 5, 20, 0.34) 0%, transparent 22%, transparent 80%, rgba(8, 4, 16, 0.48) 100%);
 }
 
-/* --- TOPO: RELÓGIO NA ESQUERDA + DISCORD NA DIREITA --- */
+/* --- TOPO: RELÓGIO + STATUS ONLINE/OFFLINE NA ESQUERDA + DISCORD NA DIREITA --- */
 .top-bar {
     position: fixed;
     top: 14px;
@@ -73,7 +73,7 @@ html, body {
     right: 22px;
     z-index: 20;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
     pointer-events: none;
@@ -81,6 +81,13 @@ html, body {
 
 .top-bar > * {
     pointer-events: auto;
+}
+
+.top-left-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
 }
 
 .clock-pill {
@@ -136,6 +143,52 @@ html, body {
     color: var(--purple-neon);
 }
 
+.server-state-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: var(--surface-pill);
+    border: 1px solid rgba(74, 222, 128, 0.36);
+    color: #86efac;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(5, 2, 12, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.server-state-pill:hover {
+    transform: translateY(-1px) scale(1.03);
+}
+
+.server-state-pill:active {
+    transform: translateY(1px) scale(0.97);
+}
+
+.server-state-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.75);
+    flex-shrink: 0;
+}
+
+.server-state-pill.offline {
+    border-color: rgba(248, 113, 113, 0.42);
+    color: #fca5a5;
+}
+
+.server-state-pill.offline .server-state-dot {
+    background: #f87171;
+    box-shadow: 0 0 8px rgba(248, 113, 113, 0.75);
+}
+
 .discord-btn {
     width: 38px;
     height: 38px;
@@ -162,7 +215,7 @@ html, body {
     transform: translateY(1px) scale(0.95);
 }
 
-/* --- CENTRO: LOGO MAIOR E MAIS ALTA (DENTRO DA MARGEM DO TOPO) + CAIXA ROXA --- */
+/* --- CENTRO: LOGO + CAIXA ROXA + DICA LOGO ABAIXO --- */
 .center-stage {
     position: relative;
     z-index: 10;
@@ -171,7 +224,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 46px 18px 86px;
+    padding: 36px 18px 66px;
 }
 
 .auth-stack {
@@ -190,8 +243,8 @@ html, body {
     max-height: 82px;
     height: auto;
     object-fit: contain;
-    margin-top: -16px;
-    margin-bottom: 4px;
+    margin-top: -14px;
+    margin-bottom: 3px;
     filter: drop-shadow(0 10px 18px rgba(4, 2, 10, 0.9)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.18));
     transition: transform 0.18s ease, filter 0.18s ease;
     cursor: pointer;
@@ -491,11 +544,33 @@ html, body {
     to { transform: rotate(360deg); }
 }
 
+/* --- DICA MENOR, VISÍVEL E LOGO ABAIXO DO PAINEL --- */
+.card-tip-line {
+    margin-top: 4px;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text-secondary);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.96);
+    pointer-events: none;
+}
+
+.tip-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--purple-neon);
+    margin-right: 5px;
+}
+
 /* --- CANTO INFERIOR ESQUERDO: TEXTO LIMPO SEM CAIXA --- */
 .updates-clean {
     position: fixed;
-    left: 24px;
-    bottom: 20px;
+    left: 22px;
+    bottom: 18px;
     z-index: 20;
     pointer-events: none;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
@@ -542,50 +617,26 @@ html, body {
 .dot-new { background: #e9d5ff; }
 .dot-wave { background: #a855f7; }
 
-/* --- RODAPÉ CENTRAL: TEXTO LIMPO SEM CAIXA --- */
-.footer-tip-clean {
+/* --- CANTO INFERIOR DIREITO: MUSIC PLAYER EM LINHA RETA E COMPACTA --- */
+.player-box {
     position: fixed;
-    left: 50%;
-    bottom: 20px;
-    transform: translateX(-50%);
-    z-index: 15;
-    pointer-events: none;
+    right: 22px;
+    bottom: 18px;
+    z-index: 20;
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    font-size: 11.5px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.92);
-    white-space: nowrap;
-}
-
-.tip-label {
-    font-family: var(--font-display);
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    color: var(--purple-neon);
-}
-
-/* --- CANTO INFERIOR DIREITO: MUSIC PLAYER COM WAVE DISCRETA --- */
-.player-box {
-    position: fixed;
-    right: 24px;
-    bottom: 20px;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px 13px 7px;
-    border-radius: 16px;
+    height: 44px;
+    padding: 0 13px 0 8px;
+    border-radius: 999px;
     background: var(--surface-pill);
     border: 1px solid var(--border-purple);
     box-shadow:
         0 12px 28px rgba(5, 2, 12, 0.76),
         0 4px 14px rgba(124, 58, 237, 0.16),
         inset 0 1px 0 rgba(233, 213, 255, 0.14);
-    max-width: min(450px, calc(100vw - 48px));
+    max-width: min(410px, calc(100vw - 44px));
+    overflow: hidden;
     transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -598,15 +649,9 @@ html, body {
         inset 0 1px 0 rgba(233, 213, 255, 0.18);
 }
 
-.player-main-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 .ctrl-btn {
-    width: 29px;
-    height: 29px;
+    width: 27px;
+    height: 27px;
     border-radius: 50%;
     border: 1px solid rgba(192, 132, 252, 0.26);
     background: rgba(124, 58, 237, 0.22);
@@ -631,8 +676,8 @@ html, body {
 }
 
 .ctrl-btn.play-btn {
-    width: 33px;
-    height: 33px;
+    width: 31px;
+    height: 31px;
     background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
     border-color: var(--purple-neon);
     color: #ffffff;
@@ -652,9 +697,9 @@ html, body {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    max-width: 155px;
+    max-width: 142px;
     padding: 0 2px;
-    line-height: 1.2;
+    line-height: 1.18;
 }
 
 .track-title {
@@ -667,7 +712,7 @@ html, body {
 }
 
 .track-artist {
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 600;
     color: var(--purple-neon);
     white-space: nowrap;
@@ -675,19 +720,19 @@ html, body {
     text-overflow: ellipsis;
 }
 
-/* Wave discreta: parada quando pausado, animada suavemente quando toca */
+/* Wave discreta alinhada na mesma linha */
 .music-wave {
     display: inline-flex;
     align-items: center;
-    gap: 2.5px;
-    height: 15px;
-    padding: 0 3px;
+    gap: 2px;
+    height: 14px;
+    padding: 0 2px;
     flex-shrink: 0;
 }
 
 .music-wave span {
     display: block;
-    width: 2.5px;
+    width: 2px;
     height: 4px;
     border-radius: 999px;
     background: rgba(192, 132, 252, 0.55);
@@ -702,28 +747,27 @@ html, body {
 .player-box.playing .music-wave span:nth-child(1) { animation-delay: 0s; }
 .player-box.playing .music-wave span:nth-child(2) { animation-delay: 0.16s; }
 .player-box.playing .music-wave span:nth-child(3) { animation-delay: 0.32s; }
-.player-box.playing .music-wave span:nth-child(4) { animation-delay: 0.48s; }
-.player-box.playing .music-wave span:nth-child(5) { animation-delay: 0.24s; }
+.player-box.playing .music-wave span:nth-child(4) { animation-delay: 0.2s; }
 
 @keyframes wavePulse {
     0%, 100% { height: 4px; opacity: 0.55; }
-    50% { height: 14px; opacity: 1; }
+    50% { height: 13px; opacity: 1; }
 }
 
 .volume-wrap {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding-left: 4px;
+    gap: 5px;
+    padding-left: 6px;
     border-left: 1px solid rgba(216, 180, 254, 0.16);
 }
 
 .volume-label {
     font-family: var(--font-display);
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
     color: var(--purple-soft);
-    min-width: 28px;
+    min-width: 26px;
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
@@ -731,8 +775,8 @@ html, body {
 #volumeSlider {
     -webkit-appearance: none;
     appearance: none;
-    width: 56px;
-    height: 4px;
+    width: 48px;
+    height: 3.5px;
     border-radius: 999px;
     background: rgba(168, 85, 247, 0.28);
     outline: none;
@@ -742,8 +786,8 @@ html, body {
 #volumeSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     background: var(--purple-neon);
     border: 1px solid #ffffff;
@@ -756,30 +800,26 @@ html, body {
     transform: scale(1.2);
 }
 
+/* Barra de progresso fininha rente à borda inferior da pílula */
 .player-progress-track {
-    width: 100%;
-    height: 3px;
-    border-radius: 999px;
-    background: rgba(216, 180, 254, 0.14);
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 0;
+    height: 2px;
+    background: rgba(216, 180, 254, 0.12);
     overflow: hidden;
 }
 
 .player-progress-fill {
     width: 0%;
     height: 100%;
-    border-radius: 999px;
     background: linear-gradient(90deg, var(--purple-core), var(--purple-neon));
     transition: width 0.2s linear;
 }
 
 .hidden {
     display: none !important;
-}
-
-@media (max-width: 1080px) {
-    .footer-tip-clean {
-        display: none;
-    }
 }
 
 @media (max-width: 720px) {
@@ -790,7 +830,7 @@ html, body {
     }
 
     .center-stage {
-        padding: 42px 14px 108px;
+        padding: 34px 14px 104px;
     }
 
     .login-logo {
@@ -800,7 +840,7 @@ html, body {
 
     .updates-clean {
         left: 14px;
-        bottom: 78px;
+        bottom: 68px;
     }
 
     .player-box {
