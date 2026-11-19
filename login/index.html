@@ -4,142 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VOLTS RP — Portal de Autenticação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="bg-layer" aria-hidden="true">
+    <div class="bg-scene" aria-hidden="true">
         <div class="bg-photo"></div>
-        <div class="bg-vignette"></div>
-        <div class="bg-grain"></div>
+        <div class="bg-overlay"></div>
+        <div class="bg-accent-glow"></div>
     </div>
 
-    <div class="cinematic-frame">
-        <header class="top-bar">
-            <div class="brand">
-                <div class="brand-badge">VRP</div>
-                <div class="brand-text">
-                    <h1>VOLTS <span>ROLEPLAY</span></h1>
-                    <p>PORTAL DE AUTENTICAÇÃO • LOS SANTOS</p>
-                </div>
+    <div class="portal-shell">
+        <header class="top-strip">
+            <div class="top-brand">
+                <span class="top-mark">VRP</span>
+                <span class="top-title">VOLTS <strong>ROLEPLAY</strong></span>
             </div>
 
-            <div class="top-actions">
-                <div class="music-widget" title="Player de música da tela inicial">
-                    <div class="music-meta">
-                        <span id="musicTrackTitle" class="music-track">Carregando faixa...</span>
-                        <span id="musicTrackArtist" class="music-artist">Artista desconhecido</span>
-                    </div>
-
-                    <div id="musicEq" class="eq-bars" aria-hidden="true">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-
-                    <button id="btnNextTrack" type="button" class="btn-icon" title="Próxima música" aria-label="Próxima música">⏭</button>
-                    <button id="btnAudio" type="button" class="btn-ghost">Música: ON</button>
+            <div class="music-pill" title="Trilha sonora da autenticação">
+                <div class="music-text">
+                    <span id="musicTrackTitle" class="music-name">Carregando faixa...</span>
+                    <span id="musicTrackArtist" class="music-artist">Artista</span>
                 </div>
-
-                <button id="btnFallback" type="button" class="btn-ghost" title="Modo clássico">Modo Clássico</button>
-                <button id="btnQuit" type="button" class="btn-quit">Sair</button>
+                <div id="musicEq" class="eq-bars" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <button id="btnNextTrack" type="button" class="music-btn" title="Próxima música" aria-label="Próxima música">⏭</button>
+                <button id="btnAudio" type="button" class="music-btn music-toggle">Música: ON</button>
             </div>
         </header>
 
-        <main class="portal-container">
-            <section class="auth-card" aria-label="Autenticação de jogador">
-                <div class="sync-strip">
-                    <div class="sync-left">
-                        <span id="syncDot" class="sync-dot"></span>
-                        <span id="syncStatusText">Sincronizando com o servidor...</span>
+        <main class="portal-main">
+            <section class="split-portal" aria-label="Portal de acesso VOLTS RP">
+                <!-- PAINEL ESQUERDO -->
+                <aside class="panel-left">
+                    <div class="panel-left-top">
+                        <div class="brand-hero">
+                            <div class="brand-emblem" aria-hidden="true">V</div>
+                            <div>
+                                <p class="brand-kicker">LOS SANTOS • ROLEPLAY</p>
+                                <h1 class="brand-heading">VOLTS <span>RP</span></h1>
+                            </div>
+                        </div>
+
+                        <div class="time-card" aria-label="Horário atual">
+                            <span class="time-label">HORÁRIO ATUAL</span>
+                            <strong id="liveClock" class="time-value">--:--:--</strong>
+                        </div>
                     </div>
-                    <span id="syncTimer">00s</span>
+
+                    <div class="panel-left-bottom">
+                        <div class="status-row">
+                            <span id="syncDot" class="status-led"></span>
+                            <span id="syncStatusText">Sincronizando autenticação...</span>
+                            <span id="syncTimer" class="sync-elapsed">00s</span>
+                        </div>
+                        <div class="subtle-divider"></div>
+                        <p class="panel-note">Autenticação protegida do seu personagem no servidor.</p>
+                    </div>
+                </aside>
+
+                <!-- PAINEL DIREITO -->
+                <div class="panel-right">
+                    <div class="auth-header">
+                        <div class="auth-brand-top">
+                            <span class="auth-mini-logo">VOLTS RP</span>
+                            <div id="accountStatusBadge" class="account-badge unregistered">
+                                <span class="badge-dot"></span>
+                                <span id="accountStatusText">Verificando conta...</span>
+                            </div>
+                        </div>
+                        <h2 id="cardTitle">Acessar Conta</h2>
+                        <p id="cardSubtitle">Aguardando verificação do personagem.</p>
+                    </div>
+
+                    <div class="mode-switch" role="tablist">
+                        <button id="tabLogin" type="button" class="mode-btn active" data-tab="login" role="tab" aria-selected="true">Entrar</button>
+                        <button id="tabRegister" type="button" class="mode-btn" data-tab="register" role="tab" aria-selected="false">Criar Conta</button>
+                    </div>
+
+                    <div id="feedbackBox" class="feedback-box hidden" role="alert"></div>
+
+                    <form id="formLogin" class="auth-form" autocomplete="off">
+                        <div class="field-group">
+                            <label for="loginUsername">Usuário / Personagem</label>
+                            <div class="field-box readonly">
+                                <input id="loginUsername" type="text" readonly>
+                                <span class="field-tag">CONTA</span>
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="loginPassword">Senha</label>
+                            <div class="field-box">
+                                <input id="loginPassword" type="password" placeholder="Digite sua senha" maxlength="64" required>
+                                <button type="button" class="pass-eye" data-target="loginPassword">Ver</button>
+                            </div>
+                        </div>
+
+                        <button id="btnSubmitLogin" type="submit" class="btn-main">
+                            <span>Entrar</span>
+                            <span class="spinner hidden"></span>
+                        </button>
+                    </form>
+
+                    <form id="formRegister" class="auth-form hidden" autocomplete="off">
+                        <div class="field-group">
+                            <label for="regUsername">Usuário / Personagem</label>
+                            <div class="field-box readonly">
+                                <input id="regUsername" type="text" readonly>
+                                <span class="field-tag">NOVO</span>
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="regPassword">Senha (mín. 6 caracteres)</label>
+                            <div class="field-box">
+                                <input id="regPassword" type="password" placeholder="Crie uma senha" maxlength="64" required>
+                                <button type="button" class="pass-eye" data-target="regPassword">Ver</button>
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="regPasswordConfirm">Confirmar Senha</label>
+                            <div class="field-box">
+                                <input id="regPasswordConfirm" type="password" placeholder="Repita a senha" maxlength="64" required>
+                                <button type="button" class="pass-eye" data-target="regPasswordConfirm">Ver</button>
+                            </div>
+                        </div>
+
+                        <button id="btnSubmitRegister" type="submit" class="btn-main btn-create">
+                            <span>Criar Conta</span>
+                            <span class="spinner hidden"></span>
+                        </button>
+                    </form>
                 </div>
-
-                <div class="card-header">
-                    <div id="accountStatusBadge" class="account-pill unregistered">
-                        <span class="status-dot"></span>
-                        <span id="accountStatusText">Verificando conta...</span>
-                    </div>
-                    <h2 id="cardTitle">Acessar Conta</h2>
-                    <p id="cardSubtitle">Aguardando dados do seu personagem.</p>
-                </div>
-
-                <div class="auth-tabs" role="tablist">
-                    <button id="tabLogin" type="button" class="tab-btn active" data-tab="login" role="tab" aria-selected="true">Acessar Conta</button>
-                    <button id="tabRegister" type="button" class="tab-btn" data-tab="register" role="tab" aria-selected="false">Criar Conta</button>
-                </div>
-
-                <div id="feedbackBox" class="feedback-box hidden" role="alert"></div>
-
-                <form id="formLogin" class="auth-form" autocomplete="off">
-                    <div class="input-group">
-                        <label for="loginUsername">Personagem / Usuário</label>
-                        <div class="input-wrapper readonly">
-                            <input id="loginUsername" type="text" readonly>
-                            <span class="input-tag">SA-MP</span>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="loginPassword">Senha</label>
-                        <div class="input-wrapper">
-                            <input id="loginPassword" type="password" placeholder="Digite sua senha" maxlength="64" required>
-                            <button type="button" class="toggle-pass" data-target="loginPassword">Ver</button>
-                        </div>
-                    </div>
-
-                    <button id="btnSubmitLogin" type="submit" class="btn-primary">
-                        <span>Entrar no Jogo</span>
-                        <span class="spinner hidden"></span>
-                    </button>
-                </form>
-
-                <form id="formRegister" class="auth-form hidden" autocomplete="off">
-                    <div class="input-group">
-                        <label for="regUsername">Personagem / Usuário</label>
-                        <div class="input-wrapper readonly">
-                            <input id="regUsername" type="text" readonly>
-                            <span class="input-tag">NOVO</span>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="regPassword">Nova Senha (mín. 6 caracteres)</label>
-                        <div class="input-wrapper">
-                            <input id="regPassword" type="password" placeholder="Crie uma senha forte" maxlength="64" required>
-                            <button type="button" class="toggle-pass" data-target="regPassword">Ver</button>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="regPasswordConfirm">Confirmar Senha</label>
-                        <div class="input-wrapper">
-                            <input id="regPasswordConfirm" type="password" placeholder="Repita a mesma senha" maxlength="64" required>
-                            <button type="button" class="toggle-pass" data-target="regPasswordConfirm">Ver</button>
-                        </div>
-                    </div>
-
-                    <button id="btnSubmitRegister" type="submit" class="btn-primary accent-amber">
-                        <span>Criar Conta e Entrar</span>
-                        <span class="spinner hidden"></span>
-                    </button>
-                </form>
             </section>
         </main>
-
-        <footer class="bottom-bar">
-            <div class="footer-left">
-                <span>VOLTS RP • Conexão Segura</span>
-                <span>•</span>
-                <span id="liveClock">--:--:--</span>
-            </div>
-            <span>CEF Portal Ready</span>
-        </footer>
     </div>
 
     <audio id="bgMusic" preload="auto"></audio>
-
     <script src="app.js"></script>
 </body>
 </html>
