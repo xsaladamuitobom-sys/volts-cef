@@ -97,7 +97,7 @@
     }
 
     function playCurrentAudioElement() {
-        if (!el.bgMusic) return;
+        if (!el.bgMusic || !state.audioEnabled) return;
         el.bgMusic.volume = 0.35;
         const promise = el.bgMusic.play();
         if (promise && typeof promise.then === 'function') {
@@ -140,6 +140,22 @@
             emitToServer('volts:audio', '1');
         }
     }
+
+    function stopMusicCleanly() {
+        state.audioEnabled = false;
+        if (el.bgMusic) {
+            try {
+                el.bgMusic.pause();
+                el.bgMusic.currentTime = 0;
+                el.bgMusic.removeAttribute('src');
+                el.bgMusic.load();
+            } catch (_) {}
+        }
+        syncAudioUI(false);
+    }
+
+    window.addEventListener('pagehide', stopMusicCleanly);
+    window.addEventListener('beforeunload', stopMusicCleanly);
 
     if (el.bgMusic) {
         el.bgMusic.addEventListener('ended', () => {
