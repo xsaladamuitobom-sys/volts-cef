@@ -42,8 +42,6 @@
         btnSubmitRegister: document.getElementById('btnSubmitRegister'),
         btnAudio: document.getElementById('btnAudio'),
         btnNextTrack: document.getElementById('btnNextTrack'),
-        btnQuit: document.getElementById('btnQuit'),
-        btnFallback: document.getElementById('btnFallback'),
         feedbackBox: document.getElementById('feedbackBox'),
         accountStatusBadge: document.getElementById('accountStatusBadge'),
         accountStatusText: document.getElementById('accountStatusText'),
@@ -227,11 +225,11 @@
 
         if (isLogin) {
             el.cardTitle.textContent = 'Acessar Conta';
-            el.cardSubtitle.textContent = 'Insira sua senha para carregar seu personagem.';
+            el.cardSubtitle.textContent = 'Digite sua senha para entrar no jogo.';
             el.loginPassword.focus();
         } else {
-            el.cardTitle.textContent = 'Criar Nova Conta';
-            el.cardSubtitle.textContent = 'Defina uma senha segura para iniciar sua jornada.';
+            el.cardTitle.textContent = 'Criar Conta';
+            el.cardSubtitle.textContent = 'Defina uma senha para cadastrar seu personagem.';
             el.regPassword.focus();
         }
     }
@@ -253,7 +251,7 @@
 
         if (registered) {
             el.accountStatusBadge.classList.remove('unregistered');
-            el.accountStatusText.textContent = `${state.username} • Conta Registrada`;
+            el.accountStatusText.textContent = `${state.username} • Registrada`;
             switchTab('login');
         } else {
             el.accountStatusBadge.classList.add('unregistered');
@@ -317,9 +315,6 @@
         setLoading(true);
         emitToServer('volts:register', `${pass1}|${pass2}`);
     });
-
-    el.btnQuit.addEventListener('click', () => emitToServer('volts:quit', '1'));
-    el.btnFallback.addEventListener('click', () => emitToServer('volts:fallback', '1'));
 
     window.addEventListener('load', () => {
         const startTrack = getRandomTrackIndex();
