@@ -1,10 +1,32 @@
 (() => {
+    // Edite aqui o nome da música, quem canta e o arquivo .mp3 na pasta /login/
+    const PLAYLIST = [
+        {
+            title: 'Madrugada em Los Santos',
+            artist: 'MC Volts / DJ Night',
+            src: './musica1.mp3'
+        },
+        {
+            title: 'Som da Quebrada',
+            artist: 'Artista 02',
+            src: './musica2.mp3'
+        },
+        {
+            title: 'Horizonte Cinza',
+            artist: 'Artista 03',
+            src: './musica3.mp3'
+        }
+    ];
+
     const state = {
         username: '',
         registered: false,
         loading: false,
         activeTab: 'login',
-        audioPlaying: true
+        synced: false,
+        audioEnabled: true,
+        trackIndex: 0,
+        secondsElapsed: 0
     };
 
     const el = {
@@ -20,14 +42,22 @@
         btnSubmitLogin: document.getElementById('btnSubmitLogin'),
         btnSubmitRegister: document.getElementById('btnSubmitRegister'),
         btnAudio: document.getElementById('btnAudio'),
-        audioLabel: document.getElementById('audioLabel'),
+        btnNextTrack: document.getElementById('btnNextTrack'),
         btnQuit: document.getElementById('btnQuit'),
         btnFallback: document.getElementById('btnFallback'),
         feedbackBox: document.getElementById('feedbackBox'),
         accountStatusBadge: document.getElementById('accountStatusBadge'),
         accountStatusText: document.getElementById('accountStatusText'),
         cardTitle: document.getElementById('cardTitle'),
-        cardSubtitle: document.getElementById('cardSubtitle')
+        cardSubtitle: document.getElementById('cardSubtitle'),
+        syncDot: document.getElementById('syncDot'),
+        syncStatusText: document.getElementById('syncStatusText'),
+        syncTimer: document.getElementById('syncTimer'),
+        liveClock: document.getElementById('liveClock'),
+        musicTrackTitle: document.getElementById('musicTrackTitle'),
+        musicTrackArtist: document.getElementById('musicTrackArtist'),
+        musicEq: document.getElementById('musicEq'),
+        bgMusic: document.getElementById('bgMusic')
     };
 
     function emitToServer(eventName, payload = '') {
@@ -36,52 +66,113 @@
         }
     }
 
-    function initParticles() {
-        const canvas = document.getElementById('particleCanvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        let width = (canvas.width = window.innerWidth);
-        let height = (canvas.height = window.innerHeight);
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
-
-        const particles = Array.from({ length: 38 }, () => ({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            r: Math.random() * 2 + 0.8,
-            vx: (Math.random() - 0.5) * 0.35,
-            vy: -Math.random() * 0.45 - 0.15,
-            alpha: Math.random() * 0.5 + 0.2
-        }));
-
-        function render() {
-            ctx.clearRect(0, 0, width, height);
-            for (const p of particles) {
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.y < -10) {
-                    p.y = height + 10;
-                    p.x = Math.random() * width;
-                }
-                if (p.x < -10) p.x = width + 10;
-                if (p.x > width + 10) p.x = -10;
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 229, 255, ${p.alpha})`;
-                ctx.fill();
-            }
-            requestAnimationFrame(render);
-        }
-        render();
+    function updateTrackInfo() {
+        const track = PLAYLIST[state.trackIndex] || { title: 'Sem faixa', artist: 'Desconhecido', src: '' };
+        if (el.musicTrackTitle) el.musicTrackTitle.textContent = track.title;
+        if (el.musicTrackArtist) el.musicTrackArtist.textContent = track.artist;
+        return track;
     }
+
+    function syncAudioUI(playing) {
+        if (el.btnAudio) el.btnAudio.textContent = state.audioEnabled ? 'Música: ON' : 'Música: OFF';
+        if (el.musicEq) el.musicEq.classList.toggle('playing', Boolean(state.audioEnabled && playing));
+    }
+
+    function loadAndPlayTrack(index, autoplay = true) {
+        if (!PLAYLIST.length || !el.bgMusic) return;
+        state.trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+        const track = updateTrackInfo();
+
+        el.bgMusic.src = track.src;
+        el.bgMusic.volume = 0.35;
+        el.bgMusic.load();
+
+        if (!state.audioEnabled || !autoplay) {
+            syncAudioUI(false);
+            return;
+        }
+
+        const promise = el.bgMusic.play();
+        if (promise && typeof promise.then === 'function') {
+            promise.then(() => syncAudioUI(true)).catch(() => syncAudioUI(false));
+        }
+    }
+
+    function nextTrack() {
+        loadAndPlayTrack(state.trackIndex + 1, state.audioEnabled);
+    }
+
+    function toggleAudio() {
+        state.audioEnabled = !state.audioEnabled;
+        if (!state.audioEnabled) {
+            if (el.bgMusic) el.bgMusic.pause();
+            syncAudioUI(false);
+            emitToServer('volts:audio', '0');
+        } else {
+            if (el.bgMusic && el.bgMusic.src) {
+                el.bgMusic.volume = 0.35;
+                const promise = el.bgMusic.play();
+                if (promise && typeof promise.then === 'function') {
+                    promise.then(() => syncAudioUI(true)).catch(() => syncAudioUI(false));
+                }
+            } else {
+                loadAndPlayTrack(state.trackIndex, true);
+            }
+            emitToServer('volts:audio', '1');
+        }
+    }
+
+    if (el.bgMusic) {
+        el.bgMusic.addEventListener('ended', () => {
+            if (state.audioEnabled) {
+                nextTrack();
+            }
+        });
+        el.bgMusic.addEventListener('error', () => {
+            syncAudioUI(false);
+        });
+    }
+
+    document.addEventListener('pointerdown', () => {
+        if (state.audioEnabled && el.bgMusic && el.bgMusic.paused && el.bgMusic.src) {
+            el.bgMusic.volume = 0.35;
+            el.bgMusic.play().then(() => syncAudioUI(true)).catch(() => {});
+        }
+    }, { passive: true });
+
+    if (el.btnNextTrack) {
+        el.btnNextTrack.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextTrack();
+        });
+    }
+
+    if (el.btnAudio) {
+        el.btnAudio.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleAudio();
+        });
+    }
+
+    const timerInterval = setInterval(() => {
+        if (!state.synced && el.syncTimer) {
+            state.secondsElapsed += 1;
+            el.syncTimer.textContent = `${String(state.secondsElapsed).padStart(2, '0')}s`;
+        }
+    }, 1000);
+
+    function updateClock() {
+        if (!el.liveClock) return;
+        const now = new Date();
+        el.liveClock.textContent = now.toTimeString().slice(0, 8);
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
 
     function setLoading(isLoading) {
         state.loading = isLoading;
         [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
+            if (!btn) return;
             btn.disabled = isLoading;
             const spinner = btn.querySelector('.spinner');
             if (spinner) spinner.classList.toggle('hidden', !isLoading);
@@ -125,6 +216,13 @@
     }
 
     function applyServerInit(username, isRegisteredInt) {
+        state.synced = true;
+        clearInterval(timerInterval);
+        if (el.syncDot) el.syncDot.classList.add('synced');
+        if (el.syncStatusText) {
+            el.syncStatusText.textContent = `Sincronizado em ${String(state.secondsElapsed).padStart(2, '0')}s`;
+        }
+
         const registered = Number(isRegisteredInt) === 1;
         state.username = username || 'Jogador';
         state.registered = registered;
@@ -145,13 +243,6 @@
 
     el.tabLogin.addEventListener('click', () => switchTab('login'));
     el.tabRegister.addEventListener('click', () => switchTab('register'));
-
-    el.btnAudio.addEventListener('click', () => {
-        state.audioPlaying = !state.audioPlaying;
-        el.btnAudio.classList.toggle('playing', state.audioPlaying);
-        el.audioLabel.textContent = state.audioPlaying ? 'Música: ON' : 'Música: OFF';
-        emitToServer('volts:audio', state.audioPlaying ? '1' : '0');
-    });
 
     document.querySelectorAll('.toggle-pass').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -209,6 +300,11 @@
     el.btnQuit.addEventListener('click', () => emitToServer('volts:quit', '1'));
     el.btnFallback.addEventListener('click', () => emitToServer('volts:fallback', '1'));
 
+    window.addEventListener('load', () => {
+        loadAndPlayTrack(0, true);
+        emitToServer('volts:ready', '1');
+    });
+
     if (typeof cef !== 'undefined' && typeof cef.on === 'function') {
         cef.on('volts:init', (username, isRegistered) => {
             setLoading(false);
@@ -224,7 +320,4 @@
             }
         });
     }
-
-    initParticles();
-    emitToServer('volts:ready', '1');
 })();
