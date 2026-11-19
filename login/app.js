@@ -106,8 +106,6 @@
     }
 
     if (el.discordLink) {
-        el.discordLink.setAttribute('href', '#');
-        el.discordLink.removeAttribute('target');
         el.discordLink.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
