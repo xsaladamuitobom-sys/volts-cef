@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
     <!-- FUNDO PANORÂMICO -->
@@ -31,10 +31,10 @@
         </button>
     </header>
 
-    <!-- CENTRO: LOGO MAIOR E MAIS ALTA + CAIXA ROXA + DICA LOGO ABAIXO -->
+    <!-- CENTRO: LOGO + CAIXA ROXA + DICA COM RESPIRO ABAIXO -->
     <main class="center-stage">
         <div class="auth-stack">
-            <img src="./logo.png?v=11" alt="VOLTS RP" class="login-logo">
+            <img src="./logo.png?v=12" alt="VOLTS RP" class="login-logo">
 
             <section class="purple-card" aria-label="Autenticação VOLTS RP">
                 <div class="card-top">
@@ -142,7 +142,7 @@
                 </form>
             </section>
 
-            <!-- DICA DISCRETA LOGO ABAIXO DO PAINEL -->
+            <!-- DICA COM RESPIRO ABAIXO DO PAINEL (SEM ENCOSTAR NA PROFUNDIDADE) -->
             <p class="card-tip-line" aria-live="polite">
                 <span class="tip-label">DICA</span>
                 <span id="footerTipText">Use uma senha forte e nunca informe seus dados a outras pessoas.</span>
@@ -161,10 +161,14 @@
         </ul>
     </aside>
 
-    <!-- CANTO INFERIOR DIREITO: MUSIC PLAYER LIMPO SEM CAIXA -->
-    <div id="playerBox" class="player-clean" aria-label="Player de música">
-        <div class="player-clean-header">
-            <span class="player-clean-heading">MÚSICA</span>
+    <!-- CANTO INFERIOR DIREITO: PLAYER TRANSPARENTE (NOME + WAVE EM CIMA, ÍCONES EMBAIXO) -->
+    <div id="playerBox" class="player-ghost" aria-label="Player de música">
+        <div class="player-song-line">
+            <div class="track-meta">
+                <span id="musicTrackTitle" class="track-title">Carregando faixa...</span>
+                <span id="musicTrackArtist" class="track-artist">VOLTS RP</span>
+            </div>
+
             <div class="music-wave" aria-hidden="true">
                 <span></span>
                 <span></span>
@@ -173,42 +177,31 @@
             </div>
         </div>
 
-        <div class="player-clean-controls">
-            <button id="btnPrevTrack" type="button" class="clean-action-btn" title="Música anterior" aria-label="Música anterior">
-                <span class="clean-symbol">«</span>
-                <span class="clean-tag">ANT</span>
+        <div class="player-icon-row">
+            <button id="btnPrevTrack" type="button" class="ghost-icon-btn" title="Música anterior" aria-label="Música anterior">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
+                </svg>
             </button>
 
-            <button id="btnPlayPause" type="button" class="clean-action-btn primary" title="Tocar ou pausar" aria-label="Tocar ou pausar">
-                <span id="iconPlay" class="hidden clean-symbol">▶</span>
-                <span id="iconPause" class="clean-symbol">❚❚</span>
-                <span id="playStateLabel" class="clean-tag">PAUSE</span>
+            <button id="btnPlayPause" type="button" class="ghost-icon-btn mid" title="Tocar ou pausar" aria-label="Tocar ou pausar">
+                <svg id="iconPlay" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                <svg id="iconPause" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                </svg>
             </button>
 
-            <button id="btnNextTrack" type="button" class="clean-action-btn" title="Próxima música" aria-label="Próxima música">
-                <span class="clean-symbol">»</span>
-                <span class="clean-tag">PRÓX</span>
+            <button id="btnNextTrack" type="button" class="ghost-icon-btn" title="Próxima música" aria-label="Próxima música">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                </svg>
             </button>
-        </div>
-
-        <div class="player-clean-footer">
-            <div class="track-meta">
-                <span id="musicTrackTitle" class="track-title">Carregando faixa...</span>
-                <span id="musicTrackArtist" class="track-artist">VOLTS RP</span>
-            </div>
-
-            <div class="volume-wrap" title="Volume da música">
-                <span id="volumeLabel" class="volume-label">35%</span>
-                <input id="volumeSlider" type="range" min="0" max="100" value="35" aria-label="Volume da música">
-            </div>
-        </div>
-
-        <div class="player-progress-track" aria-hidden="true">
-            <div id="musicProgressFill" class="player-progress-fill"></div>
         </div>
     </div>
 
     <audio id="bgMusic" preload="auto"></audio>
-    <script src="app.js?v=11"></script>
+    <script src="app.js?v=12"></script>
 </body>
 </html>
