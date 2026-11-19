@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
     <!-- FUNDO PANORÂMICO -->
@@ -16,12 +16,19 @@
         <div class="bg-vignette"></div>
     </div>
 
-    <!-- TOPO: RELÓGIO NA ESQUERDA + DISCORD NA DIREITA -->
+    <!-- TOPO: RELÓGIO + STATUS NA ESQUERDA + DISCORD NA DIREITA -->
     <header class="top-bar">
-        <div class="clock-pill" title="Horário atual">
-            <span class="clock-dot"></span>
-            <span id="liveClock" class="clock-time">--:--:--</span>
-            <span class="clock-tag">BR</span>
+        <div class="top-left-stack">
+            <div class="clock-pill" title="Horário atual">
+                <span class="clock-dot"></span>
+                <span id="liveClock" class="clock-time">--:--:--</span>
+                <span class="clock-tag">BR</span>
+            </div>
+
+            <button id="serverStatusBadge" type="button" class="server-state-pill online" title="Status do servidor">
+                <span class="server-state-dot"></span>
+                <span id="serverStatusLabel">ONLINE</span>
+            </button>
         </div>
 
         <button id="discordLink" type="button" class="discord-btn" title="Copiar Discord VOLTS RP" aria-label="Copiar Discord VOLTS RP">
@@ -31,10 +38,10 @@
         </button>
     </header>
 
-    <!-- CENTRO: LOGO CENTRALIZADA + CAIXA ROXA -->
+    <!-- CENTRO: LOGO + CAIXA ROXA + DICA LOGO ABAIXO -->
     <main class="center-stage">
         <div class="auth-stack">
-            <img src="./logo.png?v=9" alt="VOLTS RP" class="login-logo">
+            <img src="./logo.png?v=10" alt="VOLTS RP" class="login-logo">
 
             <section class="purple-card" aria-label="Autenticação VOLTS RP">
                 <div class="card-top">
@@ -141,6 +148,12 @@
                     </button>
                 </form>
             </section>
+
+            <!-- DICA DISCRETA LOGO ABAIXO DO PAINEL DE LOGIN -->
+            <p class="card-tip-line" aria-live="polite">
+                <span class="tip-label">DICA</span>
+                <span id="footerTipText">Use uma senha forte e nunca informe seus dados a outras pessoas.</span>
+            </p>
         </div>
     </main>
 
@@ -155,53 +168,44 @@
         </ul>
     </aside>
 
-    <!-- RODAPÉ CENTRAL: TEXTO LIMPO SEM CAIXA -->
-    <div class="footer-tip-clean" aria-live="polite">
-        <span class="tip-label">DICA</span>
-        <span id="footerTipText">Use uma senha forte e nunca informe seus dados a outras pessoas.</span>
-    </div>
-
-    <!-- CANTO INFERIOR DIREITO: MUSIC PLAYER COM WAVE DISCRETA -->
+    <!-- CANTO INFERIOR DIREITO: MUSIC PLAYER EM LINHA RETA E COMPACTA -->
     <div id="playerBox" class="player-box" aria-label="Player de música">
-        <div class="player-main-row">
-            <button id="btnPrevTrack" type="button" class="ctrl-btn" title="Música anterior" aria-label="Música anterior">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                    <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
-                </svg>
-            </button>
+        <button id="btnPrevTrack" type="button" class="ctrl-btn" title="Música anterior" aria-label="Música anterior">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
+            </svg>
+        </button>
 
-            <button id="btnPlayPause" type="button" class="ctrl-btn play-btn" title="Tocar ou pausar" aria-label="Tocar ou pausar">
-                <svg id="iconPlay" class="hidden" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                </svg>
-                <svg id="iconPause" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                </svg>
-            </button>
+        <button id="btnPlayPause" type="button" class="ctrl-btn play-btn" title="Tocar ou pausar" aria-label="Tocar ou pausar">
+            <svg id="iconPlay" class="hidden" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg id="iconPause" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+        </button>
 
-            <button id="btnNextTrack" type="button" class="ctrl-btn" title="Próxima música" aria-label="Próxima música">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                </svg>
-            </button>
+        <button id="btnNextTrack" type="button" class="ctrl-btn" title="Próxima música" aria-label="Próxima música">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+        </button>
 
-            <div class="track-meta">
-                <span id="musicTrackTitle" class="track-title">Carregando faixa...</span>
-                <span id="musicTrackArtist" class="track-artist">VOLTS RP</span>
-            </div>
+        <div class="track-meta">
+            <span id="musicTrackTitle" class="track-title">Carregando faixa...</span>
+            <span id="musicTrackArtist" class="track-artist">VOLTS RP</span>
+        </div>
 
-            <div class="music-wave" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+        <div class="music-wave" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
-            <div class="volume-wrap" title="Volume da música">
-                <span id="volumeLabel" class="volume-label">35%</span>
-                <input id="volumeSlider" type="range" min="0" max="100" value="35" aria-label="Volume da música">
-            </div>
+        <div class="volume-wrap" title="Volume da música">
+            <span id="volumeLabel" class="volume-label">35%</span>
+            <input id="volumeSlider" type="range" min="0" max="100" value="35" aria-label="Volume da música">
         </div>
 
         <div class="player-progress-track" aria-hidden="true">
@@ -210,6 +214,6 @@
     </div>
 
     <audio id="bgMusic" preload="auto"></audio>
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=10"></script>
 </body>
 </html>
