@@ -1,4 +1,6 @@
 (() => {
+    const DEFAULT_DISCORD_INVITE = 'https://discord.gg/VgJXqdtWN5';
+
     const PLAYLIST = [
         {
             title: 'DANADA ME LIGANDO',
@@ -24,11 +26,13 @@
         activeTab: 'login',
         audioEnabled: true,
         isPlaying: false,
-        trackIndex: 0
+        trackIndex: 0,
+        discordUrl: DEFAULT_DISCORD_INVITE
     };
 
     const el = {
         liveClock: document.getElementById('liveClock'),
+        discordLink: document.getElementById('discordLink'),
         btnPrevTrack: document.getElementById('btnPrevTrack'),
         btnPlayPause: document.getElementById('btnPlayPause'),
         btnNextTrack: document.getElementById('btnNextTrack'),
@@ -58,6 +62,41 @@
         if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
             cef.emit(eventName, String(payload));
         }
+    }
+
+    function isValidDiscordUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+        const trimmed = url.trim();
+        return (
+            trimmed.startsWith('https://discord.gg/') ||
+            trimmed.startsWith('https://discord.com/invite/') ||
+            trimmed.startsWith('https://discordapp.com/invite/')
+        );
+    }
+
+    function applyDiscordUrl(url) {
+        if (!isValidDiscordUrl(url)) return;
+        state.discordUrl = url.trim();
+        if (el.discordLink) {
+            el.discordLink.setAttribute('href', state.discordUrl);
+        }
+    }
+
+    if (el.discordLink) {
+        applyDiscordUrl(state.discordUrl);
+        el.discordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetUrl = isValidDiscordUrl(state.discordUrl)
+                ? state.discordUrl
+                : DEFAULT_DISCORD_INVITE;
+
+            if (typeof cef !== 'undefined' && typeof cef.openUrl === 'function') {
+                cef.openUrl(targetUrl);
+                return;
+            }
+
+            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        });
     }
 
     function updateClock() {
@@ -309,10 +348,14 @@
         }
     }
 
-    function applyServerInit(username, isRegisteredInt) {
+    function applyServerInit(username, isRegisteredInt, discordUrl) {
         const registered = Number(isRegisteredInt) === 1;
         state.username = username || 'Jogador';
         state.registered = registered;
+
+        if (discordUrl) {
+            applyDiscordUrl(discordUrl);
+        }
 
         if (el.loginUsername) el.loginUsername.value = state.username;
         if (el.regUsername) el.regUsername.value = state.username;
@@ -387,9 +430,13 @@
     });
 
     if (typeof cef !== 'undefined' && typeof cef.on === 'function') {
-        cef.on('volts:init', (username, isRegistered) => {
+        cef.on('volts:init', (username, isRegistered, discordUrl) => {
             setLoading(false);
-            applyServerInit(username, isRegistered);
+            applyServerInit(username, isRegistered, discordUrl);
+        });
+
+        cef.on('volts:discord', (url) => {
+            applyDiscordUrl(url);
         });
 
         cef.on('volts:feedback', (type, message) => {
