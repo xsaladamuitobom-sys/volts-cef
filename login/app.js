@@ -42,11 +42,14 @@
         trackIndex: 0,
         volume: 0.35,
         tipIndex: 0,
+        serverOnline: true,
         discordUrl: DEFAULT_DISCORD_INVITE
     };
 
     const el = {
         liveClock: document.getElementById('liveClock'),
+        serverStatusBadge: document.getElementById('serverStatusBadge'),
+        serverStatusLabel: document.getElementById('serverStatusLabel'),
         discordLink: document.getElementById('discordLink'),
         playerBox: document.getElementById('playerBox'),
         btnPrevTrack: document.getElementById('btnPrevTrack'),
@@ -81,6 +84,17 @@
     function emitToServer(eventName, payload = '') {
         if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
             cef.emit(eventName, String(payload));
+        }
+    }
+
+    function setServerOnlineState(isOnline) {
+        state.serverOnline = Boolean(isOnline);
+        if (el.serverStatusBadge) {
+            el.serverStatusBadge.classList.toggle('online', state.serverOnline);
+            el.serverStatusBadge.classList.toggle('offline', !state.serverOnline);
+        }
+        if (el.serverStatusLabel) {
+            el.serverStatusLabel.textContent = state.serverOnline ? 'ONLINE' : 'OFFLINE';
         }
     }
 
@@ -530,6 +544,7 @@
     setInterval(updateClock, 1000);
     pickRandomTip(true);
     setInterval(() => pickRandomTip(false), 8000);
+    setServerOnlineState(true);
     applyVolume(35);
     resetAllPasswordInputs();
 
@@ -547,6 +562,12 @@
 
         cef.on('volts:discord', (url) => {
             applyDiscordUrl(url);
+        });
+
+        cef.on('volts:status', (statusValue) => {
+            const normalized = String(statusValue || '').trim().toLowerCase();
+            const isOffline = normalized === '0' || normalized === 'offline' || normalized === 'false';
+            setServerOnlineState(!isOffline);
         });
 
         cef.on('volts:feedback', (type, message) => {
