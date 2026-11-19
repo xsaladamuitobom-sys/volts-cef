@@ -1,19 +1,18 @@
 (() => {
-    // Edite aqui o nome da música, quem canta e o arquivo .mp3 na pasta /login/
     const PLAYLIST = [
         {
-            title: 'Madrugada em Los Santos',
-            artist: 'MC Volts / DJ Night',
-            src: './musica1.mp3'
+            title: 'DANADA ME LIGANDO',
+            artist: 'MC Cebezinho, MC Tuto e MC Kako',
+            src: './musica.mp3'
         },
         {
-            title: 'Som da Quebrada',
-            artist: 'Artista 02',
+            title: 'Lobo da Madruga',
+            artist: 'MC Poze do Rodo ft. Meno K, MC Rodrigo do CN, MC Ryan SP e Bielzin',
             src: './musica2.mp3'
         },
         {
-            title: 'Horizonte Cinza',
-            artist: 'Artista 03',
+            title: "LET'S GO 5",
+            artist: 'MC IG',
             src: './musica3.mp3'
         }
     ];
@@ -66,6 +65,27 @@
         }
     }
 
+    function getRandomTrackIndex() {
+        if (PLAYLIST.length <= 1) return 0;
+
+        let lastIndex = -1;
+        try {
+            const saved = sessionStorage.getItem('volts_last_login_track');
+            if (saved !== null) lastIndex = Number(saved);
+        } catch (_) {}
+
+        let nextIdx = Math.floor(Math.random() * PLAYLIST.length);
+        if (nextIdx === lastIndex) {
+            nextIdx = (nextIdx + 1) % PLAYLIST.length;
+        }
+
+        try {
+            sessionStorage.setItem('volts_last_login_track', String(nextIdx));
+        } catch (_) {}
+
+        return nextIdx;
+    }
+
     function updateTrackInfo() {
         const track = PLAYLIST[state.trackIndex] || { title: 'Sem faixa', artist: 'Desconhecido', src: '' };
         if (el.musicTrackTitle) el.musicTrackTitle.textContent = track.title;
@@ -78,13 +98,21 @@
         if (el.musicEq) el.musicEq.classList.toggle('playing', Boolean(state.audioEnabled && playing));
     }
 
+    function playCurrentAudioElement() {
+        if (!el.bgMusic) return;
+        el.bgMusic.volume = 0.35;
+        const promise = el.bgMusic.play();
+        if (promise && typeof promise.then === 'function') {
+            promise.then(() => syncAudioUI(true)).catch(() => syncAudioUI(false));
+        }
+    }
+
     function loadAndPlayTrack(index, autoplay = true) {
         if (!PLAYLIST.length || !el.bgMusic) return;
         state.trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
-        const track = updateTrackInfo();
 
+        const track = updateTrackInfo();
         el.bgMusic.src = track.src;
-        el.bgMusic.volume = 0.35;
         el.bgMusic.load();
 
         if (!state.audioEnabled || !autoplay) {
@@ -92,10 +120,7 @@
             return;
         }
 
-        const promise = el.bgMusic.play();
-        if (promise && typeof promise.then === 'function') {
-            promise.then(() => syncAudioUI(true)).catch(() => syncAudioUI(false));
-        }
+        playCurrentAudioElement();
     }
 
     function nextTrack() {
@@ -110,11 +135,7 @@
             emitToServer('volts:audio', '0');
         } else {
             if (el.bgMusic && el.bgMusic.src) {
-                el.bgMusic.volume = 0.35;
-                const promise = el.bgMusic.play();
-                if (promise && typeof promise.then === 'function') {
-                    promise.then(() => syncAudioUI(true)).catch(() => syncAudioUI(false));
-                }
+                playCurrentAudioElement();
             } else {
                 loadAndPlayTrack(state.trackIndex, true);
             }
@@ -128,6 +149,7 @@
                 nextTrack();
             }
         });
+
         el.bgMusic.addEventListener('error', () => {
             syncAudioUI(false);
         });
@@ -135,8 +157,7 @@
 
     document.addEventListener('pointerdown', () => {
         if (state.audioEnabled && el.bgMusic && el.bgMusic.paused && el.bgMusic.src) {
-            el.bgMusic.volume = 0.35;
-            el.bgMusic.play().then(() => syncAudioUI(true)).catch(() => {});
+            playCurrentAudioElement();
         }
     }, { passive: true });
 
@@ -301,7 +322,8 @@
     el.btnFallback.addEventListener('click', () => emitToServer('volts:fallback', '1'));
 
     window.addEventListener('load', () => {
-        loadAndPlayTrack(0, true);
+        const startTrack = getRandomTrackIndex();
+        loadAndPlayTrack(startTrack, true);
         emitToServer('volts:ready', '1');
     });
 
