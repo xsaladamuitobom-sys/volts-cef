@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
     <!-- FUNDO PANORÂMICO -->
@@ -16,17 +16,12 @@
         <div class="bg-vignette"></div>
     </div>
 
-    <!-- TOPO: RELÓGIO NA ESQUERDA + STATUS NO CENTRO + DISCORD NA DIREITA -->
+    <!-- TOPO: RELÓGIO NA ESQUERDA + DISCORD NA DIREITA -->
     <header class="top-bar">
         <div class="clock-pill" title="Horário atual">
             <span class="clock-dot"></span>
             <span id="liveClock" class="clock-time">--:--:--</span>
             <span class="clock-tag">BR</span>
-        </div>
-
-        <div id="serverStatusPill" class="status-pill" title="Status do servidor">
-            <span class="status-dot"></span>
-            <span id="serverStatusText">VOLTS RP • ONLINE</span>
         </div>
 
         <button id="discordLink" type="button" class="discord-btn" title="Copiar Discord VOLTS RP" aria-label="Copiar Discord VOLTS RP">
@@ -39,7 +34,7 @@
     <!-- CENTRO: LOGO CENTRALIZADA + CAIXA ROXA -->
     <main class="center-stage">
         <div class="auth-stack">
-            <img src="./logo.png?v=8" alt="VOLTS RP" class="login-logo">
+            <img src="./logo.png?v=9" alt="VOLTS RP" class="login-logo">
 
             <section class="purple-card" aria-label="Autenticação VOLTS RP">
                 <div class="card-top">
@@ -160,13 +155,13 @@
         </ul>
     </aside>
 
-    <!-- RODAPÉ CENTRAL DISCRETO: DICA RÁPIDA -->
-    <div class="footer-tip" aria-live="polite">
-        <span class="tip-badge">DICA</span>
-        <span id="footerTipText">Use senhas fortes e não compartilhe seus dados com ninguém.</span>
+    <!-- RODAPÉ CENTRAL: TEXTO LIMPO SEM CAIXA -->
+    <div class="footer-tip-clean" aria-live="polite">
+        <span class="tip-label">DICA</span>
+        <span id="footerTipText">Use uma senha forte e nunca informe seus dados a outras pessoas.</span>
     </div>
 
-    <!-- CANTO INFERIOR DIREITO: MUSIC PLAYER COM WAVE DISCRETA, VOLUME E PROGRESSO -->
+    <!-- CANTO INFERIOR DIREITO: MUSIC PLAYER COM WAVE DISCRETA -->
     <div id="playerBox" class="player-box" aria-label="Player de música">
         <div class="player-main-row">
             <button id="btnPrevTrack" type="button" class="ctrl-btn" title="Música anterior" aria-label="Música anterior">
@@ -215,6 +210,6 @@
     </div>
 
     <audio id="bgMusic" preload="auto"></audio>
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=9"></script>
 </body>
 </html>
