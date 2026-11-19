@@ -19,6 +19,12 @@
         }
     ];
 
+    const TIPS = [
+        'Use senhas fortes e não compartilhe seus dados com ninguém.',
+        'Clique no ícone do Discord no topo para copiar o convite oficial.',
+        'Ajuste o volume ou troque de faixa no player no canto inferior direito.'
+    ];
+
     const state = {
         username: '',
         registered: false,
@@ -27,12 +33,16 @@
         audioEnabled: true,
         isPlaying: false,
         trackIndex: 0,
+        volume: 0.35,
+        tipIndex: 0,
         discordUrl: DEFAULT_DISCORD_INVITE
     };
 
     const el = {
         liveClock: document.getElementById('liveClock'),
+        serverStatusText: document.getElementById('serverStatusText'),
         discordLink: document.getElementById('discordLink'),
+        playerBox: document.getElementById('playerBox'),
         btnPrevTrack: document.getElementById('btnPrevTrack'),
         btnPlayPause: document.getElementById('btnPlayPause'),
         btnNextTrack: document.getElementById('btnNextTrack'),
@@ -40,6 +50,10 @@
         iconPause: document.getElementById('iconPause'),
         musicTrackTitle: document.getElementById('musicTrackTitle'),
         musicTrackArtist: document.getElementById('musicTrackArtist'),
+        volumeSlider: document.getElementById('volumeSlider'),
+        volumeLabel: document.getElementById('volumeLabel'),
+        musicProgressFill: document.getElementById('musicProgressFill'),
+        footerTipText: document.getElementById('footerTipText'),
         bgMusic: document.getElementById('bgMusic'),
         accountBadge: document.getElementById('accountBadge'),
         cardTitle: document.getElementById('cardTitle'),
@@ -128,10 +142,52 @@
         el.liveClock.textContent = now.toTimeString().slice(0, 8);
     }
 
+    function rotateFooterTip() {
+        if (!el.footerTipText || !TIPS.length) return;
+        state.tipIndex = (state.tipIndex + 1) % TIPS.length;
+        el.footerTipText.textContent = TIPS[state.tipIndex];
+    }
+
+    function updateProgressBar() {
+        if (!el.musicProgressFill || !el.bgMusic) return;
+        const duration = el.bgMusic.duration;
+        if (!duration || !isFinite(duration) || duration <= 0) {
+            el.musicProgressFill.style.width = '0%';
+            return;
+        }
+        const pct = Math.max(0, Math.min(100, (el.bgMusic.currentTime / duration) * 100));
+        el.musicProgressFill.style.width = `${pct.toFixed(1)}%`;
+    }
+
+    function applyVolume(percentValue) {
+        const clamped = Math.max(0, Math.min(100, Number(percentValue) || 0));
+        state.volume = clamped / 100;
+        if (el.bgMusic) {
+            el.bgMusic.volume = state.volume;
+        }
+        if (el.volumeSlider) {
+            el.volumeSlider.value = String(clamped);
+        }
+        if (el.volumeLabel) {
+            el.volumeLabel.textContent = `${clamped}%`;
+        }
+    }
+
+    if (el.volumeSlider) {
+        el.volumeSlider.addEventListener('input', (e) => {
+            e.stopPropagation();
+            applyVolume(e.target.value);
+        });
+        el.volumeSlider.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+        });
+    }
+
     function syncPlayerIcons(playing) {
         state.isPlaying = Boolean(playing);
         if (el.iconPlay) el.iconPlay.classList.toggle('hidden', state.isPlaying);
         if (el.iconPause) el.iconPause.classList.toggle('hidden', !state.isPlaying);
+        if (el.playerBox) el.playerBox.classList.toggle('playing', state.isPlaying);
     }
 
     function getRandomTrackIndex() {
@@ -168,7 +224,7 @@
 
     function playAudioElement() {
         if (!el.bgMusic || !state.audioEnabled || !el.bgMusic.src) return;
-        el.bgMusic.volume = 0.35;
+        el.bgMusic.volume = state.volume;
         const req = el.bgMusic.play();
         if (req && typeof req.then === 'function') {
             req.then(() => syncPlayerIcons(true)).catch(() => syncPlayerIcons(false));
@@ -180,7 +236,12 @@
         state.trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
         const track = updateTrackLabel();
 
+        if (el.musicProgressFill) {
+            el.musicProgressFill.style.width = '0%';
+        }
+
         el.bgMusic.src = track.src;
+        el.bgMusic.volume = state.volume;
         el.bgMusic.load();
 
         if (!autoplay || !state.audioEnabled) {
@@ -231,13 +292,22 @@
                 el.bgMusic.load();
             } catch (_) {}
         }
+        if (el.musicProgressFill) {
+            el.musicProgressFill.style.width = '0%';
+        }
     }
 
     window.addEventListener('pagehide', stopMusicCleanly);
     window.addEventListener('beforeunload', stopMusicCleanly);
 
     if (el.bgMusic) {
+        el.bgMusic.addEventListener('timeupdate', updateProgressBar);
+        el.bgMusic.addEventListener('loadedmetadata', updateProgressBar);
+
         el.bgMusic.addEventListener('ended', () => {
+            if (el.musicProgressFill) {
+                el.musicProgressFill.style.width = '100%';
+            }
             if (state.audioEnabled) {
                 nextTrack();
             } else {
@@ -444,6 +514,8 @@
 
     updateClock();
     setInterval(updateClock, 1000);
+    setInterval(rotateFooterTip, 7000);
+    applyVolume(35);
     resetAllPasswordInputs();
 
     window.addEventListener('load', () => {
@@ -460,6 +532,12 @@
 
         cef.on('volts:discord', (url) => {
             applyDiscordUrl(url);
+        });
+
+        cef.on('volts:status', (statusLabel) => {
+            if (el.serverStatusText && statusLabel) {
+                el.serverStatusText.textContent = String(statusLabel);
+            }
         });
 
         cef.on('volts:feedback', (type, message) => {
