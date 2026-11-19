@@ -47,9 +47,8 @@
     };
 
     const el = {
+        clockPill: document.getElementById('clockPill'),
         liveClock: document.getElementById('liveClock'),
-        serverStatusBadge: document.getElementById('serverStatusBadge'),
-        serverStatusLabel: document.getElementById('serverStatusLabel'),
         discordLink: document.getElementById('discordLink'),
         playerBox: document.getElementById('playerBox'),
         btnPrevTrack: document.getElementById('btnPrevTrack'),
@@ -57,6 +56,7 @@
         btnNextTrack: document.getElementById('btnNextTrack'),
         iconPlay: document.getElementById('iconPlay'),
         iconPause: document.getElementById('iconPause'),
+        playStateLabel: document.getElementById('playStateLabel'),
         musicTrackTitle: document.getElementById('musicTrackTitle'),
         musicTrackArtist: document.getElementById('musicTrackArtist'),
         volumeSlider: document.getElementById('volumeSlider'),
@@ -87,15 +87,11 @@
         }
     }
 
-    function setServerOnlineState(isOnline) {
+    function setClockDotState(isOnline) {
         state.serverOnline = Boolean(isOnline);
-        if (el.serverStatusBadge) {
-            el.serverStatusBadge.classList.toggle('online', state.serverOnline);
-            el.serverStatusBadge.classList.toggle('offline', !state.serverOnline);
-        }
-        if (el.serverStatusLabel) {
-            el.serverStatusLabel.textContent = state.serverOnline ? 'ONLINE' : 'OFFLINE';
-        }
+        if (!el.clockPill) return;
+        el.clockPill.classList.toggle('is-online', state.serverOnline);
+        el.clockPill.classList.toggle('is-offline', !state.serverOnline);
     }
 
     function isValidDiscordUrl(url) {
@@ -215,6 +211,7 @@
         state.isPlaying = Boolean(playing);
         if (el.iconPlay) el.iconPlay.classList.toggle('hidden', state.isPlaying);
         if (el.iconPause) el.iconPause.classList.toggle('hidden', !state.isPlaying);
+        if (el.playStateLabel) el.playStateLabel.textContent = state.isPlaying ? 'PAUSE' : 'PLAY';
         if (el.playerBox) el.playerBox.classList.toggle('playing', state.isPlaying);
     }
 
@@ -544,7 +541,7 @@
     setInterval(updateClock, 1000);
     pickRandomTip(true);
     setInterval(() => pickRandomTip(false), 8000);
-    setServerOnlineState(true);
+    setClockDotState(true);
     applyVolume(35);
     resetAllPasswordInputs();
 
@@ -567,7 +564,7 @@
         cef.on('volts:status', (statusValue) => {
             const normalized = String(statusValue || '').trim().toLowerCase();
             const isOffline = normalized === '0' || normalized === 'offline' || normalized === 'false';
-            setServerOnlineState(!isOffline);
+            setClockDotState(!isOffline);
         });
 
         cef.on('volts:feedback', (type, message) => {
