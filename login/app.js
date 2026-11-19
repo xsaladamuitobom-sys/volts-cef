@@ -1,5 +1,6 @@
 (() => {
     const DEFAULT_DISCORD_INVITE = 'https://discord.gg/VgJXqdtWN5';
+    const FIXED_LOW_VOLUME = 0.22;
 
     const PLAYLIST = [
         {
@@ -27,7 +28,7 @@
         'Mantenha o respeito nas interações e siga as regras de roleplay.',
         'Evite divulgar links suspeitos ou aceitar arquivos de desconhecidos.',
         'Em caso de dúvida ou denúncia, procure os canais oficiais no Discord.',
-        'Ajuste o volume ou troque de faixa no player no canto inferior direito.',
+        'Use os controles de música no canto inferior direito para pausar ou trocar de faixa.',
         'Confira seu nome de personagem antes de confirmar o cadastro.',
         'Use senhas com no mínimo 6 caracteres para proteger melhor seu progresso.'
     ];
@@ -40,7 +41,7 @@
         audioEnabled: true,
         isPlaying: false,
         trackIndex: 0,
-        volume: 0.35,
+        volume: FIXED_LOW_VOLUME,
         tipIndex: 0,
         serverOnline: true,
         discordUrl: DEFAULT_DISCORD_INVITE
@@ -56,12 +57,8 @@
         btnNextTrack: document.getElementById('btnNextTrack'),
         iconPlay: document.getElementById('iconPlay'),
         iconPause: document.getElementById('iconPause'),
-        playStateLabel: document.getElementById('playStateLabel'),
         musicTrackTitle: document.getElementById('musicTrackTitle'),
         musicTrackArtist: document.getElementById('musicTrackArtist'),
-        volumeSlider: document.getElementById('volumeSlider'),
-        volumeLabel: document.getElementById('volumeLabel'),
-        musicProgressFill: document.getElementById('musicProgressFill'),
         footerTipText: document.getElementById('footerTipText'),
         bgMusic: document.getElementById('bgMusic'),
         accountBadge: document.getElementById('accountBadge'),
@@ -172,46 +169,17 @@
         el.footerTipText.textContent = TIPS[state.tipIndex];
     }
 
-    function updateProgressBar() {
-        if (!el.musicProgressFill || !el.bgMusic) return;
-        const duration = el.bgMusic.duration;
-        if (!duration || !isFinite(duration) || duration <= 0) {
-            el.musicProgressFill.style.width = '0%';
-            return;
-        }
-        const pct = Math.max(0, Math.min(100, (el.bgMusic.currentTime / duration) * 100));
-        el.musicProgressFill.style.width = `${pct.toFixed(1)}%`;
-    }
-
-    function applyVolume(percentValue) {
-        const clamped = Math.max(0, Math.min(100, Number(percentValue) || 0));
-        state.volume = clamped / 100;
+    function applyLowVolume() {
+        state.volume = FIXED_LOW_VOLUME;
         if (el.bgMusic) {
             el.bgMusic.volume = state.volume;
         }
-        if (el.volumeSlider) {
-            el.volumeSlider.value = String(clamped);
-        }
-        if (el.volumeLabel) {
-            el.volumeLabel.textContent = `${clamped}%`;
-        }
-    }
-
-    if (el.volumeSlider) {
-        el.volumeSlider.addEventListener('input', (e) => {
-            e.stopPropagation();
-            applyVolume(e.target.value);
-        });
-        el.volumeSlider.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-        });
     }
 
     function syncPlayerIcons(playing) {
         state.isPlaying = Boolean(playing);
         if (el.iconPlay) el.iconPlay.classList.toggle('hidden', state.isPlaying);
         if (el.iconPause) el.iconPause.classList.toggle('hidden', !state.isPlaying);
-        if (el.playStateLabel) el.playStateLabel.textContent = state.isPlaying ? 'PAUSE' : 'PLAY';
         if (el.playerBox) el.playerBox.classList.toggle('playing', state.isPlaying);
     }
 
@@ -249,7 +217,7 @@
 
     function playAudioElement() {
         if (!el.bgMusic || !state.audioEnabled || !el.bgMusic.src) return;
-        el.bgMusic.volume = state.volume;
+        applyLowVolume();
         const req = el.bgMusic.play();
         if (req && typeof req.then === 'function') {
             req.then(() => syncPlayerIcons(true)).catch(() => syncPlayerIcons(false));
@@ -261,12 +229,8 @@
         state.trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
         const track = updateTrackLabel();
 
-        if (el.musicProgressFill) {
-            el.musicProgressFill.style.width = '0%';
-        }
-
         el.bgMusic.src = track.src;
-        el.bgMusic.volume = state.volume;
+        applyLowVolume();
         el.bgMusic.load();
 
         if (!autoplay || !state.audioEnabled) {
@@ -317,22 +281,13 @@
                 el.bgMusic.load();
             } catch (_) {}
         }
-        if (el.musicProgressFill) {
-            el.musicProgressFill.style.width = '0%';
-        }
     }
 
     window.addEventListener('pagehide', stopMusicCleanly);
     window.addEventListener('beforeunload', stopMusicCleanly);
 
     if (el.bgMusic) {
-        el.bgMusic.addEventListener('timeupdate', updateProgressBar);
-        el.bgMusic.addEventListener('loadedmetadata', updateProgressBar);
-
         el.bgMusic.addEventListener('ended', () => {
-            if (el.musicProgressFill) {
-                el.musicProgressFill.style.width = '100%';
-            }
             if (state.audioEnabled) {
                 nextTrack();
             } else {
@@ -345,6 +300,7 @@
         });
 
         el.bgMusic.addEventListener('play', () => {
+            applyLowVolume();
             syncPlayerIcons(true);
         });
 
@@ -542,7 +498,7 @@
     pickRandomTip(true);
     setInterval(() => pickRandomTip(false), 8000);
     setClockDotState(true);
-    applyVolume(35);
+    applyLowVolume();
     resetAllPasswordInputs();
 
     window.addEventListener('load', () => {
