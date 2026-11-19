@@ -18,10 +18,6 @@
     --text-secondary: #e2d9f3;
     --text-muted: #b3a4d1;
 
-    --ok: #22c55e;
-    --warn: #f59e0b;
-    --err: #ef4444;
-
     --radius-card: 16px;
     --radius-field: 9px;
 }
@@ -66,20 +62,19 @@ html, body {
     pointer-events: none;
     background:
         radial-gradient(circle at center, rgba(16, 8, 32, 0.06) 0%, rgba(9, 5, 18, 0.52) 100%),
-        linear-gradient(180deg, rgba(10, 5, 20, 0.36) 0%, transparent 22%, transparent 80%, rgba(8, 4, 16, 0.48) 100%);
+        linear-gradient(180deg, rgba(10, 5, 20, 0.34) 0%, transparent 22%, transparent 80%, rgba(8, 4, 16, 0.48) 100%);
 }
 
-/* --- BARRA SUPERIOR: RELÓGIO + PLAYER + DISCORD --- */
+/* --- TOPO: RELÓGIO FIRME NA ESQUERDA + DISCORD NA DIREITA --- */
 .top-bar {
     position: fixed;
-    top: 16px;
-    left: 20px;
-    right: 20px;
+    top: 18px;
+    left: 22px;
+    right: 22px;
     z-index: 20;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
     pointer-events: none;
 }
 
@@ -91,7 +86,7 @@ html, body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 14px;
+    padding: 8px 15px;
     border-radius: 999px;
     background: var(--surface-pill);
     border: 1px solid var(--border-purple);
@@ -103,83 +98,19 @@ html, body {
     height: 7px;
     border-radius: 50%;
     background: var(--purple-neon);
-}
-
-.clock-time {
-    font-family: var(--font-display);
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--purple-soft);
-}
-
-.player-box {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: var(--surface-pill);
-    border: 1px solid var(--border-purple);
-    box-shadow: 0 8px 24px rgba(6, 3, 14, 0.55);
-    max-width: 390px;
-}
-
-.ctrl-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid rgba(192, 132, 252, 0.24);
-    background: rgba(124, 58, 237, 0.2);
-    color: var(--text-primary);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    transition: background 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
     flex-shrink: 0;
 }
 
-.ctrl-btn:hover {
-    background: rgba(168, 85, 247, 0.36);
-    border-color: var(--purple-neon);
-}
-
-.ctrl-btn:active {
-    transform: scale(0.95);
-}
-
-.ctrl-btn.play-btn {
-    width: 34px;
-    height: 34px;
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
-    border-color: var(--purple-neon);
-    color: #ffffff;
-}
-
-.track-meta {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    padding: 0 4px;
-    line-height: 1.2;
-}
-
-.track-title {
-    font-size: 11px;
+.clock-time {
+    display: inline-block;
+    min-width: 74px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 14px;
     font-weight: 700;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.track-artist {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--purple-neon);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    letter-spacing: 1.4px;
+    color: var(--purple-soft);
+    font-variant-numeric: tabular-nums;
 }
 
 .discord-btn {
@@ -211,7 +142,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 68px 18px 84px;
+    padding: 72px 18px 92px;
 }
 
 .purple-card {
@@ -444,104 +375,154 @@ html, body {
     to { transform: rotate(360deg); }
 }
 
-/* --- CANTO INFERIOR: FIX / ATUALIZAÇÕES --- */
-.changelog-box {
+/* --- CANTO INFERIOR ESQUERDO: TEXTO LIMPO SEM CAIXA --- */
+.updates-clean {
     position: fixed;
-    left: 20px;
-    bottom: 16px;
+    left: 24px;
+    bottom: 20px;
     z-index: 20;
-    width: min(360px, calc(100vw - 40px));
-    background: var(--surface-pill);
-    border: 1px solid var(--border-purple);
-    border-radius: 12px;
-    padding: 10px 13px;
-    box-shadow: 0 12px 32px rgba(5, 2, 12, 0.65);
+    pointer-events: none;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
-.changelog-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-}
-
-.changelog-title {
+.updates-heading {
+    display: block;
     font-family: var(--font-display);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.5px;
     color: var(--purple-neon);
+    margin-bottom: 7px;
 }
 
-.changelog-tag {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-muted);
-}
-
-.changelog-list {
+.updates-items {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    font-size: 11px;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
     color: var(--text-secondary);
 }
 
-.changelog-list li {
+.updates-items li {
     display: flex;
     align-items: center;
-    gap: 6px;
-    line-height: 1.3;
+    gap: 8px;
 }
 
-.tag-fix,
-.tag-add,
-.tag-chg {
-    font-family: var(--font-display);
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 5px;
-    border-radius: 4px;
+.dot-opt,
+.dot-fix,
+.dot-new {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
     flex-shrink: 0;
 }
 
-.tag-fix {
-    background: rgba(34, 197, 94, 0.18);
-    color: #86efac;
+.dot-opt { background: #c084fc; }
+.dot-fix { background: #4ade80; }
+.dot-new { background: #e9d5ff; }
+
+/* --- CANTO INFERIOR DIREITO: MUSIC PLAYER --- */
+.player-box {
+    position: fixed;
+    right: 24px;
+    bottom: 20px;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: var(--surface-pill);
+    border: 1px solid var(--border-purple);
+    box-shadow: 0 10px 28px rgba(5, 2, 12, 0.65);
+    max-width: min(390px, calc(100vw - 48px));
 }
 
-.tag-add {
-    background: rgba(168, 85, 247, 0.24);
-    color: var(--purple-soft);
+.ctrl-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(192, 132, 252, 0.24);
+    background: rgba(124, 58, 237, 0.2);
+    color: var(--text-primary);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+    flex-shrink: 0;
 }
 
-.tag-chg {
-    background: rgba(245, 158, 11, 0.2);
-    color: #fde68a;
+.ctrl-btn:hover {
+    background: rgba(168, 85, 247, 0.36);
+    border-color: var(--purple-neon);
+}
+
+.ctrl-btn:active {
+    transform: scale(0.95);
+}
+
+.ctrl-btn.play-btn {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
+    border-color: var(--purple-neon);
+    color: #ffffff;
+}
+
+.track-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 0 4px;
+    line-height: 1.2;
+}
+
+.track-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-artist {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--purple-neon);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .hidden {
     display: none !important;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 720px) {
     .top-bar {
-        top: 10px;
-        left: 12px;
-        right: 12px;
+        top: 12px;
+        left: 14px;
+        right: 14px;
+    }
+
+    .updates-clean {
+        left: 14px;
+        bottom: 68px;
     }
 
     .player-box {
-        max-width: 220px;
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+        max-width: none;
+        justify-content: flex-start;
     }
 
     .purple-card {
         padding: 18px;
-    }
-
-    .changelog-box {
-        left: 12px;
-        bottom: 12px;
     }
 }
