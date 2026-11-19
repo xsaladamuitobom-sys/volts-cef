@@ -7,8 +7,8 @@
     --cyan-soft: #67e8f9;
     --blue-deep: #0b1930;
 
-    --panel-left-bg: linear-gradient(160deg, rgba(10, 22, 44, 0.84) 0%, rgba(7, 14, 29, 0.88) 100%);
-    --panel-right-bg: rgba(9, 16, 31, 0.82);
+    --panel-left-bg: linear-gradient(160deg, rgba(10, 22, 44, 0.93) 0%, rgba(7, 14, 29, 0.95) 100%);
+    --panel-right-bg: rgba(9, 16, 31, 0.92);
     --border-subtle: rgba(125, 211, 252, 0.18);
     --border-strong: rgba(56, 189, 248, 0.36);
 
@@ -16,7 +16,7 @@
     --text-secondary: #cbd5e1;
     --text-muted: #94a3b8;
 
-    --input-bg: rgba(15, 27, 51, 0.72);
+    --input-bg: rgba(15, 27, 51, 0.84);
     --input-border: rgba(148, 163, 184, 0.22);
 
     --danger: #ef4444;
@@ -58,14 +58,7 @@ html, body {
     background-image: url('./fundo.png');
     background-size: cover;
     background-position: center;
-    transform: scale(1.03);
     filter: saturate(0.85) contrast(1.04) brightness(0.72);
-    animation: panSmooth 38s ease-in-out infinite alternate;
-}
-
-@keyframes panSmooth {
-    0%   { transform: scale(1.03) translate3d(0px, 0px, 0px); }
-    100% { transform: scale(1.08) translate3d(-12px, -6px, 0px); }
 }
 
 .bg-overlay {
@@ -99,9 +92,8 @@ html, body {
 .top-strip {
     width: 100%;
     padding: 12px clamp(18px, 4vw, 48px);
-    background: rgba(6, 13, 27, 0.72);
+    background: rgba(6, 13, 27, 0.9);
     border-bottom: 1px solid var(--border-subtle);
-    backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -143,7 +135,7 @@ html, body {
     gap: 10px;
     padding: 5px 10px 5px 14px;
     border-radius: 999px;
-    background: rgba(11, 22, 43, 0.78);
+    background: rgba(11, 22, 43, 0.88);
     border: 1px solid var(--border-subtle);
     transition: border-color 0.2s ease;
 }
@@ -244,7 +236,6 @@ html, body {
     overflow: hidden;
     border: 1px solid var(--border-strong);
     box-shadow: 0 26px 64px rgba(2, 8, 20, 0.75);
-    backdrop-filter: blur(16px);
     animation: portalReveal 0.3s ease-out;
 }
 
@@ -318,7 +309,7 @@ html, body {
 }
 
 .time-card {
-    background: rgba(7, 16, 34, 0.68);
+    background: rgba(7, 16, 34, 0.78);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-inner);
     padding: 14px 16px;
@@ -461,7 +452,7 @@ html, body {
     gap: 8px;
     padding: 4px;
     border-radius: var(--radius-inner);
-    background: rgba(5, 11, 24, 0.72);
+    background: rgba(5, 11, 24, 0.82);
     border: 1px solid rgba(148, 163, 184, 0.14);
     margin-bottom: 16px;
 }
@@ -544,7 +535,7 @@ html, body {
 
 .field-box.readonly {
     opacity: 0.85;
-    background: rgba(12, 22, 42, 0.5);
+    background: rgba(12, 22, 42, 0.65);
 }
 
 .field-box input {
