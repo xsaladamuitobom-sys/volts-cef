@@ -38,7 +38,7 @@ html, body {
     font-family: var(--font-body);
 }
 
-/* --- FUNDO PANORÂMICO COM ALTA VISIBILIDADE (~80-85%) --- */
+/* --- FUNDO PANORÂMICO EM 70% --- */
 .bg-layer {
     position: fixed;
     inset: 0;
@@ -52,7 +52,8 @@ html, body {
     background-image: url('./fundo.png');
     background-size: cover;
     background-position: center;
-    filter: saturate(1.02) contrast(1.04) brightness(0.84);
+    opacity: 0.70;
+    filter: saturate(1.02) contrast(1.04) brightness(0.70);
 }
 
 .bg-vignette {
@@ -61,8 +62,8 @@ html, body {
     z-index: 2;
     pointer-events: none;
     background:
-        radial-gradient(circle at center, rgba(16, 8, 32, 0.06) 0%, rgba(9, 5, 18, 0.52) 100%),
-        linear-gradient(180deg, rgba(10, 5, 20, 0.34) 0%, transparent 22%, transparent 80%, rgba(8, 4, 16, 0.48) 100%);
+        radial-gradient(circle at center, rgba(16, 8, 32, 0.10) 0%, rgba(9, 5, 18, 0.56) 100%),
+        linear-gradient(180deg, rgba(10, 5, 20, 0.38) 0%, transparent 22%, transparent 80%, rgba(8, 4, 16, 0.52) 100%);
 }
 
 /* --- TOPO: RELÓGIO COM BOLINHA ONLINE/OFFLINE NA ESQUERDA + DISCORD NA DIREITA --- */
@@ -174,7 +175,7 @@ html, body {
     transform: translateY(1px) scale(0.95);
 }
 
-/* --- CENTRO: LOGO + CAIXA ROXA + DICA COM RESPIRO ABAIXO --- */
+/* --- CENTRO: LOGO BEM MAIOR E BEM MAIS PARA CIMA + CAIXA ROXA --- */
 .center-stage {
     position: relative;
     z-index: 10;
@@ -503,10 +504,14 @@ html, body {
     to { transform: rotate(360deg); }
 }
 
-/* --- DICA COM RESPIRO ABAIXO DO PAINEL (SEM ENCOSTAR NA PROFUNDIDADE) --- */
+/* --- DICA MAIS BAIXA, MAS UM POUCO ACIMA DO LIMITE INFERIOR --- */
 .card-tip-line {
-    margin-top: 16px;
-    width: 100%;
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 15;
+    max-width: min(520px, calc(100vw - 44px));
     text-align: center;
     font-size: 11px;
     font-weight: 500;
@@ -704,6 +709,12 @@ html, body {
     display: none !important;
 }
 
+@media (max-width: 1020px) {
+    .card-tip-line {
+        display: none;
+    }
+}
+
 @media (max-width: 720px) {
     .top-bar {
         top: 12px;
@@ -721,7 +732,7 @@ html, body {
     }
 
     .card-tip-line {
-        margin-top: 14px;
+        bottom: 22px;
     }
 
     .updates-clean {
