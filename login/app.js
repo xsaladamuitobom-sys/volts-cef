@@ -1,8 +1,8 @@
 
 (() => {
-    const DEFAULT_DISCORD_INVITE = 'https://discord.gg/VgJXqdtWN5';
     const FIXED_LOW_VOLUME = 0.22;
     const REQUEST_TIMEOUT_MS = 12000;
+    const TIP_INTERVAL_MS = 9000;
 
     const PLAYLIST = [
         {
@@ -23,6 +23,15 @@
             src: './musica3.mp3',
             cover: './capa3.png'
         }
+    ];
+
+    const CITY_TIPS = [
+        'Construa sua história. Suas escolhas definem seu caminho na cidade.',
+        'Respeite as regras de interpretação e valorize a experiência de todos.',
+        'Conheça a cidade antes de se aventurar em novas oportunidades.',
+        'Trabalhe, conquiste seu espaço e desenvolva sua trajetória.',
+        'Boas histórias são construídas com interação e criatividade.',
+        'Cada decisão pode mudar o rumo da sua vida na cidade.'
     ];
 
     const WEAK_PASSWORDS = new Set([
@@ -46,14 +55,15 @@
         trackIndex: 0,
         volume: FIXED_LOW_VOLUME,
         serverOnline: true,
-        discordUrl: DEFAULT_DISCORD_INVITE,
-        loadingTimer: null
+        loadingTimer: null,
+        currentTipIndex: 0,
+        tipTimer: null
     };
 
     const el = {
         clockPill: document.getElementById('clockPill'),
         liveClock: document.getElementById('liveClock'),
-        discordLink: document.getElementById('discordLink'),
+
         playerBox: document.getElementById('playerBox'),
         musicCoverImg: document.getElementById('musicCoverImg'),
         btnPrevTrack: document.getElementById('btnPrevTrack'),
@@ -64,30 +74,54 @@
         musicTrackTitle: document.getElementById('musicTrackTitle'),
         musicTrackArtist: document.getElementById('musicTrackArtist'),
         bgMusic: document.getElementById('bgMusic'),
+
         accountBadge: document.getElementById('accountBadge'),
         tabLogin: document.getElementById('tabLogin'),
         tabRegister: document.getElementById('tabRegister'),
         feedbackBox: document.getElementById('feedbackBox'),
+
         formLogin: document.getElementById('formLogin'),
         formRegister: document.getElementById('formRegister'),
+
         loginUsername: document.getElementById('loginUsername'),
         regUsername: document.getElementById('regUsername'),
+
         loginPassword: document.getElementById('loginPassword'),
         regPassword: document.getElementById('regPassword'),
         regPasswordConfirm: document.getElementById('regPasswordConfirm'),
+
         btnSubmitLogin: document.getElementById('btnSubmitLogin'),
-        btnSubmitRegister: document.getElementById('btnSubmitRegister')
+        btnSubmitRegister: document.getElementById('btnSubmitRegister'),
+
+        cityTip: document.getElementById('cityTip'),
+        cityTipNumber: document.getElementById('cityTipNumber'),
+        cityTipProgress: document.getElementById('cityTipProgress')
     };
 
+    /* =========================================================
+       COMUNICAÇÃO COM O SERVIDOR
+       ========================================================= */
+
     function emitToServer(eventName, payload = '') {
-        if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
+        if (
+            typeof cef !== 'undefined' &&
+            typeof cef.emit === 'function'
+        ) {
             cef.emit(eventName, String(payload));
             return true;
         }
 
-        console.error('[VOLTS CEF] Não foi possível enviar o evento:', eventName);
+        console.error(
+            '[VOLTS CEF] Não foi possível enviar o evento:',
+            eventName
+        );
+
         return false;
     }
+
+    /* =========================================================
+       VALIDAÇÃO DE SENHA
+       ========================================================= */
 
     function isWeakPassword(pass) {
         const lower = String(pass || '').toLowerCase();
@@ -95,7 +129,10 @@
         if (WEAK_PASSWORDS.has(lower)) return true;
         if (/^(.)\1+$/.test(lower)) return true;
 
-        if ('01234567890'.includes(lower) || '09876543210'.includes(lower)) {
+        if (
+            '01234567890'.includes(lower) ||
+            '09876543210'.includes(lower)
+        ) {
             return true;
         }
 
@@ -106,103 +143,110 @@
             return true;
         }
 
-        if (state.username && lower === state.username.toLowerCase()) {
+        if (
+            state.username &&
+            lower === state.username.toLowerCase()
+        ) {
             return true;
         }
 
         return false;
     }
 
+    /* =========================================================
+       STATUS E RELÓGIO
+       ========================================================= */
+
     function setClockDotState(isOnline) {
         state.serverOnline = Boolean(isOnline);
 
         if (!el.clockPill) return;
 
-        el.clockPill.classList.toggle('is-online', state.serverOnline);
-        el.clockPill.classList.toggle('is-offline', !state.serverOnline);
-    }
-
-    function isValidDiscordUrl(url) {
-        if (!url || typeof url !== 'string') return false;
-
-        const trimmed = url.trim();
-
-        return (
-            trimmed.startsWith('https://discord.gg/') ||
-            trimmed.startsWith('https://discord.com/invite/') ||
-            trimmed.startsWith('https://discordapp.com/invite/')
+        el.clockPill.classList.toggle(
+            'is-online',
+            state.serverOnline
         );
-    }
 
-    function applyDiscordUrl(url) {
-        if (!isValidDiscordUrl(url)) return;
-        state.discordUrl = url.trim();
-    }
-
-    function copyTextToClipboard(text) {
-        if (
-            navigator.clipboard &&
-            typeof navigator.clipboard.writeText === 'function'
-        ) {
-            return navigator.clipboard
-                .writeText(text)
-                .catch(() => fallbackCopyText(text));
-        }
-
-        return Promise.resolve(fallbackCopyText(text));
-    }
-
-    function fallbackCopyText(text) {
-        const temp = document.createElement('textarea');
-
-        temp.value = text;
-        temp.setAttribute('readonly', '');
-        temp.style.position = 'fixed';
-        temp.style.top = '-9999px';
-        temp.style.opacity = '0';
-
-        document.body.appendChild(temp);
-        temp.select();
-
-        let copied = false;
-
-        try {
-            copied = document.execCommand('copy');
-        } catch (_) {
-            copied = false;
-        }
-
-        document.body.removeChild(temp);
-
-        return copied;
-    }
-
-    if (el.discordLink) {
-        el.discordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const targetUrl = isValidDiscordUrl(state.discordUrl)
-                ? state.discordUrl
-                : DEFAULT_DISCORD_INVITE;
-
-            copyTextToClipboard(targetUrl).then(() => {
-                showFeedback(
-                    'success',
-                    `Discord copiado (${targetUrl})! Cole no seu navegador.`
-                );
-            });
-
-            emitToServer('volts:discord_click', targetUrl);
-        });
+        el.clockPill.classList.toggle(
+            'is-offline',
+            !state.serverOnline
+        );
     }
 
     function updateClock() {
         if (!el.liveClock) return;
 
         const now = new Date();
-        el.liveClock.textContent = now.toTimeString().slice(0, 8);
+
+        el.liveClock.textContent = now
+            .toTimeString()
+            .slice(0, 8);
     }
+
+    /* =========================================================
+       DICAS DA CIDADE
+       ========================================================= */
+
+    function updateTipProgress() {
+        if (!el.cityTipProgress) return;
+
+        const progress = el.cityTipProgress;
+
+        progress.style.transition = 'none';
+        progress.style.width = '0%';
+
+        // Reinicia a animação da barra.
+        void progress.offsetWidth;
+
+        progress.style.transition =
+            `width ${TIP_INTERVAL_MS}ms linear`;
+
+        progress.style.width = '100%';
+    }
+
+    function updateCityTip() {
+        if (!el.cityTip || CITY_TIPS.length === 0) return;
+
+        state.currentTipIndex =
+            (state.currentTipIndex + 1) % CITY_TIPS.length;
+
+        el.cityTip.textContent =
+            CITY_TIPS[state.currentTipIndex];
+
+        if (el.cityTipNumber) {
+            el.cityTipNumber.textContent =
+                `/// ${String(state.currentTipIndex + 1).padStart(2, '0')}`;
+        }
+
+        updateTipProgress();
+    }
+
+    function initializeCityTips() {
+        if (!el.cityTip) return;
+
+        state.currentTipIndex = 0;
+
+        el.cityTip.textContent = CITY_TIPS[0];
+
+        if (el.cityTipNumber) {
+            el.cityTipNumber.textContent = '/// 01';
+        }
+
+        updateTipProgress();
+
+        if (state.tipTimer) {
+            clearInterval(state.tipTimer);
+        }
+
+        state.tipTimer = setInterval(
+            updateCityTip,
+            TIP_INTERVAL_MS
+        );
+    }
+
+    /* =========================================================
+       SISTEMA DE MÚSICA
+       ========================================================= */
 
     function applyLowVolume() {
         state.volume = FIXED_LOW_VOLUME;
@@ -216,15 +260,24 @@
         state.isPlaying = Boolean(playing);
 
         if (el.iconPlay) {
-            el.iconPlay.classList.toggle('hidden', state.isPlaying);
+            el.iconPlay.classList.toggle(
+                'hidden',
+                state.isPlaying
+            );
         }
 
         if (el.iconPause) {
-            el.iconPause.classList.toggle('hidden', !state.isPlaying);
+            el.iconPause.classList.toggle(
+                'hidden',
+                !state.isPlaying
+            );
         }
 
         if (el.playerBox) {
-            el.playerBox.classList.toggle('playing', state.isPlaying);
+            el.playerBox.classList.toggle(
+                'playing',
+                state.isPlaying
+            );
         }
     }
 
@@ -234,14 +287,18 @@
         let lastIndex = -1;
 
         try {
-            const saved = sessionStorage.getItem('volts_last_login_track');
+            const saved = sessionStorage.getItem(
+                'volts_last_login_track'
+            );
 
             if (saved !== null) {
                 lastIndex = Number(saved);
             }
         } catch (_) {}
 
-        let nextIdx = Math.floor(Math.random() * PLAYLIST.length);
+        let nextIdx = Math.floor(
+            Math.random() * PLAYLIST.length
+        );
 
         if (nextIdx === lastIndex) {
             nextIdx = (nextIdx + 1) % PLAYLIST.length;
@@ -274,7 +331,7 @@
         }
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=23`;
+            el.musicCoverImg.src = `${track.cover}?v=24`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -283,16 +340,21 @@
 
     if (el.musicCoverImg) {
         el.musicCoverImg.addEventListener('error', () => {
-            const currentSrc = el.musicCoverImg.getAttribute('src') || '';
+            const currentSrc =
+                el.musicCoverImg.getAttribute('src') || '';
 
             if (!currentSrc.includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=23';
+                el.musicCoverImg.src = './capa.png?v=24';
             }
         });
     }
 
     function playAudioElement() {
-        if (!el.bgMusic || !state.audioEnabled || !el.bgMusic.src) {
+        if (
+            !el.bgMusic ||
+            !state.audioEnabled ||
+            !el.bgMusic.src
+        ) {
             return;
         }
 
@@ -435,6 +497,10 @@
         });
     }
 
+    /* =========================================================
+       MOSTRAR E OCULTAR SENHAS
+       ========================================================= */
+
     function setEyeButtonState(btn, visible) {
         if (!btn) return;
 
@@ -455,6 +521,7 @@
     function resetAllPasswordInputs() {
         document.querySelectorAll('.eye-btn').forEach((btn) => {
             const targetId = btn.getAttribute('data-target');
+
             const input = targetId
                 ? document.getElementById(targetId)
                 : null;
@@ -470,6 +537,7 @@
     document.querySelectorAll('.eye-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const targetId = btn.getAttribute('data-target');
+
             const input = targetId
                 ? document.getElementById(targetId)
                 : null;
@@ -481,9 +549,14 @@
             input.type = showText ? 'text' : 'password';
 
             setEyeButtonState(btn, showText);
+
             input.focus();
         });
     });
+
+    /* =========================================================
+       CARREGAMENTO E FEEDBACK
+       ========================================================= */
 
     function clearLoadingTimer() {
         if (state.loadingTimer) {
@@ -494,9 +567,13 @@
 
     function setLoading(isLoading) {
         state.loading = isLoading;
+
         clearLoadingTimer();
 
-        [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
+        [
+            el.btnSubmitLogin,
+            el.btnSubmitRegister
+        ].forEach((btn) => {
             if (!btn) return;
 
             btn.disabled = isLoading;
@@ -504,7 +581,10 @@
             const spinner = btn.querySelector('.spinner');
 
             if (spinner) {
-                spinner.classList.toggle('hidden', !isLoading);
+                spinner.classList.toggle(
+                    'hidden',
+                    !isLoading
+                );
             }
         });
 
@@ -514,14 +594,20 @@
 
                 state.loading = false;
 
-                [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
+                [
+                    el.btnSubmitLogin,
+                    el.btnSubmitRegister
+                ].forEach((btn) => {
                     if (!btn) return;
 
                     btn.disabled = false;
 
-                    const spinner = btn.querySelector('.spinner');
+                    const spinner =
+                        btn.querySelector('.spinner');
 
-                    if (spinner) spinner.classList.add('hidden');
+                    if (spinner) {
+                        spinner.classList.add('hidden');
+                    }
                 });
 
                 showFeedback(
@@ -536,7 +622,9 @@
         if (!el.feedbackBox) return;
 
         el.feedbackBox.className = `feedback-box ${type}`;
+
         el.feedbackBox.textContent = message;
+
         el.feedbackBox.classList.remove('hidden');
     }
 
@@ -544,8 +632,13 @@
         if (!el.feedbackBox) return;
 
         el.feedbackBox.classList.add('hidden');
+
         el.feedbackBox.textContent = '';
     }
+
+    /* =========================================================
+       ABAS DE LOGIN E REGISTRO
+       ========================================================= */
 
     function switchTab(tab) {
         if (state.loading) return;
@@ -558,21 +651,41 @@
         const isLogin = tab === 'login';
 
         if (el.tabLogin) {
-            el.tabLogin.classList.toggle('active', isLogin);
-            el.tabLogin.setAttribute('aria-selected', String(isLogin));
+            el.tabLogin.classList.toggle(
+                'active',
+                isLogin
+            );
+
+            el.tabLogin.setAttribute(
+                'aria-selected',
+                String(isLogin)
+            );
         }
 
         if (el.tabRegister) {
-            el.tabRegister.classList.toggle('active', !isLogin);
-            el.tabRegister.setAttribute('aria-selected', String(!isLogin));
+            el.tabRegister.classList.toggle(
+                'active',
+                !isLogin
+            );
+
+            el.tabRegister.setAttribute(
+                'aria-selected',
+                String(!isLogin)
+            );
         }
 
         if (el.formLogin) {
-            el.formLogin.classList.toggle('hidden', !isLogin);
+            el.formLogin.classList.toggle(
+                'hidden',
+                !isLogin
+            );
         }
 
         if (el.formRegister) {
-            el.formRegister.classList.toggle('hidden', isLogin);
+            el.formRegister.classList.toggle(
+                'hidden',
+                isLogin
+            );
         }
 
         if (isLogin) {
@@ -586,15 +699,11 @@
         }
     }
 
-    function applyServerInit(username, isRegisteredInt, discordUrl) {
+    function applyServerInit(username, isRegisteredInt) {
         const registered = Number(isRegisteredInt) === 1;
 
         state.username = username || 'Jogador';
         state.registered = registered;
-
-        if (discordUrl) {
-            applyDiscordUrl(discordUrl);
-        }
 
         if (el.loginUsername) {
             el.loginUsername.value = state.username;
@@ -614,11 +723,15 @@
     }
 
     if (el.tabLogin) {
-        el.tabLogin.addEventListener('click', () => switchTab('login'));
+        el.tabLogin.addEventListener('click', () => {
+            switchTab('login');
+        });
     }
 
     if (el.tabRegister) {
-        el.tabRegister.addEventListener('click', () => switchTab('register'));
+        el.tabRegister.addEventListener('click', () => {
+            switchTab('register');
+        });
     }
 
     /* =========================================================
@@ -635,7 +748,11 @@
                 ? el.loginPassword.value
                 : '';
 
-            if (!password || password.length < 1 || password.length > 32) {
+            if (
+                !password ||
+                password.length < 1 ||
+                password.length > 32
+            ) {
                 showFeedback(
                     'error',
                     'Digite uma senha válida (até 32 caracteres).'
@@ -649,11 +766,16 @@
             }
 
             clearFeedback();
+
             setLoading(true);
 
             if (!emitToServer('volts:login', password)) {
                 setLoading(false);
-                showFeedback('error', 'Não foi possível conectar ao CEF.');
+
+                showFeedback(
+                    'error',
+                    'Não foi possível conectar ao CEF.'
+                );
             }
         });
     }
@@ -676,7 +798,11 @@
                 ? el.regPasswordConfirm.value
                 : '';
 
-            if (!pass1 || pass1.length < 6 || pass1.length > 32) {
+            if (
+                !pass1 ||
+                pass1.length < 6 ||
+                pass1.length > 32
+            ) {
                 showFeedback(
                     'error',
                     'A senha deve ter entre 6 e 32 caracteres.'
@@ -726,20 +852,27 @@
 
             const payload = `${pass1}|${pass2}`;
 
-            console.log('[VOLTS REGISTRO] Preparando envio:', {
-                senha1Length: pass1.length,
-                senha2Length: pass2.length,
-                payloadLength: payload.length,
-                cefDisponivel: typeof cef !== 'undefined',
-                cefEmitDisponivel:
-                    typeof cef !== 'undefined' &&
-                    typeof cef.emit === 'function'
-            });
+            console.log(
+                '[VOLTS REGISTRO] Preparando envio:',
+                {
+                    senha1Length: pass1.length,
+                    senha2Length: pass2.length,
+                    payloadLength: payload.length,
+                    cefDisponivel: typeof cef !== 'undefined',
+                    cefEmitDisponivel:
+                        typeof cef !== 'undefined' &&
+                        typeof cef.emit === 'function'
+                }
+            );
 
             clearFeedback();
+
             setLoading(true);
 
-            const enviado = emitToServer('volts:register', payload);
+            const enviado = emitToServer(
+                'volts:register',
+                payload
+            );
 
             console.log(
                 '[VOLTS REGISTRO] Evento volts:register enviado:',
@@ -748,13 +881,17 @@
 
             if (!enviado) {
                 setLoading(false);
-                showFeedback('error', 'Não foi possível conectar ao CEF.');
+
+                showFeedback(
+                    'error',
+                    'Não foi possível conectar ao CEF.'
+                );
             }
         });
     }
 
     /* =========================================================
-       INICIALIZACAO
+       INICIALIZAÇÃO
        ========================================================= */
 
     updateClock();
@@ -762,8 +899,12 @@
     setInterval(updateClock, 1000);
 
     setClockDotState(true);
+
     applyLowVolume();
+
     resetAllPasswordInputs();
+
+    initializeCityTips();
 
     window.addEventListener('load', () => {
         const startIndex = getRandomTrackIndex();
@@ -777,20 +918,18 @@
        EVENTOS CEF
        ========================================================= */
 
-    if (typeof cef !== 'undefined' && typeof cef.on === 'function') {
+    if (
+        typeof cef !== 'undefined' &&
+        typeof cef.on === 'function'
+    ) {
 
-        cef.on('volts:init', (username, isRegistered, discordUrl) => {
+        cef.on('volts:init', (username, isRegistered) => {
             setLoading(false);
 
             applyServerInit(
                 username,
-                isRegistered,
-                discordUrl
+                isRegistered
             );
-        });
-
-        cef.on('volts:discord', (url) => {
-            applyDiscordUrl(url);
         });
 
         cef.on('volts:status', (statusValue) => {
@@ -807,7 +946,8 @@
         });
 
         cef.on('volts:feedback', (type, message) => {
-            const feedbackType = String(type || 'error').toLowerCase();
+            const feedbackType =
+                String(type || 'error').toLowerCase();
 
             showFeedback(
                 feedbackType,
