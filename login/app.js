@@ -7,19 +7,19 @@
             title: 'DANADA ME LIGANDO',
             artist: 'MC Cebezinho, MC Tuto e MC Kako',
             src: './musica.mp3',
-            cover: './capa1.jpg'
+            cover: './capa.png'
         },
         {
             title: 'Lobo da Madruga',
             artist: 'MC Poze do Rodo ft. Meno K, MC Rodrigo do CN, MC Ryan SP e Bielzin',
             src: './musica2.mp3',
-            cover: './capa2.jpg'
+            cover: './capa2.png'
         },
         {
             title: "LET'S GO 5",
             artist: 'MC IG',
             src: './musica3.mp3',
-            cover: './capa3.jpg'
+            cover: './capa3.png'
         }
     ];
 
@@ -250,14 +250,14 @@
             title: 'Sem faixa',
             artist: 'VOLTS RP',
             src: '',
-            cover: './capa1.jpg'
+            cover: './capa.png'
         };
 
         if (el.musicTrackTitle) el.musicTrackTitle.textContent = track.title;
         if (el.musicTrackArtist) el.musicTrackArtist.textContent = track.artist;
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = track.cover;
+            el.musicCoverImg.src = `${track.cover}?v=17`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -266,8 +266,8 @@
 
     if (el.musicCoverImg) {
         el.musicCoverImg.addEventListener('error', () => {
-            if (el.musicCoverImg.getAttribute('src') !== './capa1.jpg') {
-                el.musicCoverImg.src = './capa1.jpg';
+            if (!el.musicCoverImg.getAttribute('src').includes('./capa.png')) {
+                el.musicCoverImg.src = './capa.png?v=17';
             }
         });
     }
