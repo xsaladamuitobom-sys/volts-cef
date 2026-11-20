@@ -1,7 +1,7 @@
-
 (() => {
     const DEFAULT_DISCORD_INVITE = 'https://discord.gg/VgJXqdtWN5';
     const FIXED_LOW_VOLUME = 0.22;
+    const REQUEST_TIMEOUT_MS = 12000;
 
     const PLAYLIST = [
         {
@@ -45,7 +45,8 @@
         trackIndex: 0,
         volume: FIXED_LOW_VOLUME,
         serverOnline: true,
-        discordUrl: DEFAULT_DISCORD_INVITE
+        discordUrl: DEFAULT_DISCORD_INVITE,
+        loadingTimer: null
     };
 
     const el = {
@@ -268,7 +269,7 @@
         }
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=22`;
+            el.musicCoverImg.src = `${track.cover}?v=23`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -280,7 +281,7 @@
             const currentSrc = el.musicCoverImg.getAttribute('src') || '';
 
             if (!currentSrc.includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=22';
+                el.musicCoverImg.src = './capa.png?v=23';
             }
         });
     }
@@ -479,8 +480,16 @@
         });
     });
 
+    function clearLoadingTimer() {
+        if (state.loadingTimer) {
+            clearTimeout(state.loadingTimer);
+            state.loadingTimer = null;
+        }
+    }
+
     function setLoading(isLoading) {
         state.loading = isLoading;
+        clearLoadingTimer();
 
         [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
             if (!btn) return;
@@ -493,6 +502,23 @@
                 spinner.classList.toggle('hidden', !isLoading);
             }
         });
+
+        if (isLoading) {
+            state.loadingTimer = setTimeout(() => {
+                if (!state.loading) return;
+                state.loading = false;
+                [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
+                    if (!btn) return;
+                    btn.disabled = false;
+                    const spinner = btn.querySelector('.spinner');
+                    if (spinner) spinner.classList.add('hidden');
+                });
+                showFeedback(
+                    'warning',
+                    'Sem resposta do servidor. Verifique o console e tente novamente.'
+                );
+            }, REQUEST_TIMEOUT_MS);
+        }
     }
 
     function showFeedback(type, message) {
@@ -743,22 +769,6 @@
 
             setClockDotState(!isOffline);
         });
-
-        /*
-            FEEDBACK DO SERVIDOR
-
-            Error:
-                Libera o carregamento e limpa os campos
-                correspondentes a aba atual.
-
-            Warning:
-                Libera o carregamento e mostra o aviso.
-
-            Success:
-                Mantem o carregamento ativo.
-                Pode representar uma etapa intermediaria,
-                como a criacao da conta antes do login automatico.
-        */
 
         cef.on('volts:feedback', (type, message) => {
             const feedbackType = String(type || 'error').toLowerCase();
