@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=17">
+    <link rel="stylesheet" href="style.css?v=18">
 </head>
 <body>
     <!-- FUNDO PANORÂMICO (70% DE VISIBILIDADE) -->
@@ -31,21 +31,26 @@
         </button>
     </header>
 
-    <!-- CENTRO: LOGO + CAIXA ROXA -->
+    <!-- CENTRO: LOGO + CAIXA ROXA REPAGINADA -->
     <main class="center-stage">
         <div class="auth-stack">
-            <img src="./logo.png?v=17" alt="VOLTS RP" class="login-logo">
+            <img src="./logo.png?v=18" alt="VOLTS RP" class="login-logo">
 
             <section class="purple-card" aria-label="Autenticação VOLTS RP">
                 <div class="card-top">
-                    <span class="server-tag">VOLTS RP</span>
+                    <div class="brand-line">
+                        <span class="pulse-bar" aria-hidden="true"></span>
+                        <span class="server-tag">VOLTS RP</span>
+                    </div>
                     <span id="accountBadge" class="account-pill">Verificando...</span>
                 </div>
 
                 <div class="card-heading">
-                    <h1 id="cardTitle">Acessar Conta</h1>
+                    <h1 id="cardTitle">Acesso ao Sistema</h1>
                     <p id="cardSubtitle">Aguardando sincronização com o servidor.</p>
                 </div>
+
+                <div class="card-divider" aria-hidden="true"></div>
 
                 <div class="tabs-bar" role="tablist">
                     <button id="tabLogin" type="button" class="tab-btn active" role="tab" aria-selected="true">Entrar</button>
@@ -57,14 +62,14 @@
                 <!-- FORMULÁRIO DE LOGIN -->
                 <form id="formLogin" class="auth-form" autocomplete="off">
                     <div class="input-block">
-                        <label for="loginUsername">Usuário</label>
+                        <label for="loginUsername">Identidade / Usuário</label>
                         <div class="input-shell readonly">
                             <input id="loginUsername" type="text" readonly>
                         </div>
                     </div>
 
                     <div class="input-block">
-                        <label for="loginPassword">Senha</label>
+                        <label for="loginPassword">Chave de Acesso (Senha)</label>
                         <div class="input-shell">
                             <input id="loginPassword" type="password" placeholder="Digite sua senha" maxlength="64" required>
                             <button type="button" class="eye-btn" data-target="loginPassword" aria-pressed="false" title="Mostrar ou ocultar senha" aria-label="Mostrar ou ocultar senha">
@@ -83,7 +88,7 @@
                     </div>
 
                     <button id="btnSubmitLogin" type="submit" class="submit-btn">
-                        <span>Entrar</span>
+                        <span>Conectar ao Servidor</span>
                         <span class="spinner hidden"></span>
                     </button>
                 </form>
@@ -91,14 +96,14 @@
                 <!-- FORMULÁRIO DE CRIAR CONTA -->
                 <form id="formRegister" class="auth-form hidden" autocomplete="off">
                     <div class="input-block">
-                        <label for="regUsername">Usuário</label>
+                        <label for="regUsername">Identidade / Usuário</label>
                         <div class="input-shell readonly">
                             <input id="regUsername" type="text" readonly>
                         </div>
                     </div>
 
                     <div class="input-block">
-                        <label for="regPassword">Senha (mín. 6 caracteres)</label>
+                        <label for="regPassword">Nova Senha (mín. 6 caracteres)</label>
                         <div class="input-shell">
                             <input id="regPassword" type="password" placeholder="Crie uma senha" maxlength="64" required>
                             <button type="button" class="eye-btn" data-target="regPassword" aria-pressed="false" title="Mostrar ou ocultar senha" aria-label="Mostrar ou ocultar senha">
@@ -136,7 +141,7 @@
                     </div>
 
                     <button id="btnSubmitRegister" type="submit" class="submit-btn">
-                        <span>Criar Conta</span>
+                        <span>Registrar Personagem</span>
                         <span class="spinner hidden"></span>
                     </button>
                 </form>
@@ -164,7 +169,7 @@
     <!-- CANTO INFERIOR DIREITO: MINI MUSIC PLAYER COM DISCO GIRATÓRIO -->
     <div id="playerBox" class="spot-mini-player" aria-label="Player de música">
         <div class="spot-disc-box">
-            <img id="musicCoverImg" src="./capa.png?v=17" alt="Capa da música" class="spot-disc-img">
+            <img id="musicCoverImg" src="./capa.png?v=18" alt="Capa da música" class="spot-disc-img">
         </div>
 
         <div class="spot-content">
@@ -218,6 +223,6 @@
     </div>
 
     <audio id="bgMusic" preload="auto"></audio>
-    <script src="app.js?v=17"></script>
+    <script src="app.js?v=18"></script>
 </body>
 </html>
