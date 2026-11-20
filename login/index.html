@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=18">
+    <link rel="stylesheet" href="style.css?v=19">
 </head>
 <body>
     <!-- FUNDO PANORÂMICO (70% DE VISIBILIDADE) -->
@@ -16,13 +16,15 @@
         <div class="bg-vignette"></div>
     </div>
 
-    <!-- TOPO: RELÓGIO COM BOLINHA ONLINE/OFFLINE NA ESQUERDA + DISCORD NA DIREITA -->
+    <!-- TOPO: RELÓGIO + LINHA BRANCA FINA + DISCORD -->
     <header class="top-bar">
         <div id="clockPill" class="clock-pill is-online" title="Horário atual e status do servidor">
             <span id="serverStatusDot" class="clock-dot"></span>
             <span id="liveClock" class="clock-time">--:--:--</span>
             <span class="clock-tag">BR</span>
         </div>
+
+        <div class="hud-line-top" aria-hidden="true"></div>
 
         <button id="discordLink" type="button" class="discord-btn" title="Copiar Discord VOLTS RP" aria-label="Copiar Discord VOLTS RP">
             <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
@@ -34,7 +36,7 @@
     <!-- CENTRO: LOGO + CAIXA ROXA REPAGINADA -->
     <main class="center-stage">
         <div class="auth-stack">
-            <img src="./logo.png?v=18" alt="VOLTS RP" class="login-logo">
+            <img src="./logo.png?v=19" alt="VOLTS RP" class="login-logo">
 
             <section class="purple-card" aria-label="Autenticação VOLTS RP">
                 <div class="card-top">
@@ -149,6 +151,9 @@
         </div>
     </main>
 
+    <!-- LINHA BRANCA FINA INFERIOR -->
+    <div class="hud-line-bottom" aria-hidden="true"></div>
+
     <!-- DICA MAIS BAIXA, MAS UM POUCO ACIMA DO LIMITE INFERIOR -->
     <p class="card-tip-line" aria-live="polite">
         <span class="tip-label">DICA</span>
@@ -162,14 +167,14 @@
             <li><span class="dot-opt"></span> Otimização geral da interface</li>
             <li><span class="dot-fix"></span> Correção de estabilidade ao sair</li>
             <li><span class="dot-new"></span> Novo visual de autenticação</li>
-            <li><span class="dot-wave"></span> Disco giratório e capas por faixa</li>
+            <li><span class="dot-wave"></span> Player limpo com capas por faixa</li>
         </ul>
     </aside>
 
-    <!-- CANTO INFERIOR DIREITO: MINI MUSIC PLAYER COM DISCO GIRATÓRIO -->
+    <!-- CANTO INFERIOR DIREITO: MINI MUSIC PLAYER TRANSPARENTE COM CAPA QUADRADA -->
     <div id="playerBox" class="spot-mini-player" aria-label="Player de música">
-        <div class="spot-disc-box">
-            <img id="musicCoverImg" src="./capa.png?v=18" alt="Capa da música" class="spot-disc-img">
+        <div class="spot-cover-box">
+            <img id="musicCoverImg" src="./capa.png?v=19" alt="Capa da música" class="spot-cover-img">
         </div>
 
         <div class="spot-content">
@@ -223,6 +228,6 @@
     </div>
 
     <audio id="bgMusic" preload="auto"></audio>
-    <script src="app.js?v=18"></script>
+    <script src="app.js?v=19"></script>
 </body>
 </html>
