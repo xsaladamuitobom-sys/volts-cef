@@ -257,7 +257,7 @@
         if (el.musicTrackArtist) el.musicTrackArtist.textContent = track.artist;
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=17`;
+            el.musicCoverImg.src = `${track.cover}?v=18`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -267,7 +267,7 @@
     if (el.musicCoverImg) {
         el.musicCoverImg.addEventListener('error', () => {
             if (!el.musicCoverImg.getAttribute('src').includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=17';
+                el.musicCoverImg.src = './capa.png?v=18';
             }
         });
     }
@@ -477,12 +477,12 @@
         if (el.formRegister) el.formRegister.classList.toggle('hidden', isLogin);
 
         if (isLogin) {
-            if (el.cardTitle) el.cardTitle.textContent = 'Acessar Conta';
-            if (el.cardSubtitle) el.cardSubtitle.textContent = 'Digite sua senha para entrar no jogo.';
+            if (el.cardTitle) el.cardTitle.textContent = 'Acesso ao Sistema';
+            if (el.cardSubtitle) el.cardSubtitle.textContent = 'Informe sua chave de acesso para entrar.';
             if (el.loginPassword) el.loginPassword.focus();
         } else {
-            if (el.cardTitle) el.cardTitle.textContent = 'Criar Conta';
-            if (el.cardSubtitle) el.cardSubtitle.textContent = 'Defina uma senha para cadastrar seu personagem.';
+            if (el.cardTitle) el.cardTitle.textContent = 'Registro de Cidadão';
+            if (el.cardSubtitle) el.cardSubtitle.textContent = 'Defina uma senha para registrar seu personagem.';
             if (el.regPassword) el.regPassword.focus();
         }
     }
