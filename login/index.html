@@ -7,10 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
-    <!-- FUNDO PANORÂMICO -->
+    <!-- FUNDO PANORÂMICO (70% DE VISIBILIDADE) -->
     <div class="bg-layer" aria-hidden="true">
         <div class="bg-photo"></div>
         <div class="bg-vignette"></div>
@@ -31,10 +31,10 @@
         </button>
     </header>
 
-    <!-- CENTRO: LOGO + CAIXA ROXA + DICA COM RESPIRO ABAIXO -->
+    <!-- CENTRO: LOGO + CAIXA ROXA -->
     <main class="center-stage">
         <div class="auth-stack">
-            <img src="./logo.png?v=12" alt="VOLTS RP" class="login-logo">
+            <img src="./logo.png?v=14" alt="VOLTS RP" class="login-logo">
 
             <section class="purple-card" aria-label="Autenticação VOLTS RP">
                 <div class="card-top">
@@ -141,14 +141,14 @@
                     </button>
                 </form>
             </section>
-
-            <!-- DICA COM RESPIRO ABAIXO DO PAINEL (SEM ENCOSTAR NA PROFUNDIDADE) -->
-            <p class="card-tip-line" aria-live="polite">
-                <span class="tip-label">DICA</span>
-                <span id="footerTipText">Use uma senha forte e nunca informe seus dados a outras pessoas.</span>
-            </p>
         </div>
     </main>
+
+    <!-- DICA MAIS BAIXA, MAS UM POUCO ACIMA DO LIMITE INFERIOR -->
+    <p class="card-tip-line" aria-live="polite">
+        <span class="tip-label">DICA</span>
+        <span id="footerTipText">Use uma senha forte e nunca informe seus dados a outras pessoas.</span>
+    </p>
 
     <!-- CANTO INFERIOR ESQUERDO: ATUALIZAÇÕES LIMPO SEM CAIXA -->
     <aside class="updates-clean" aria-label="Atualizações do servidor">
@@ -202,6 +202,6 @@
     </div>
 
     <audio id="bgMusic" preload="auto"></audio>
-    <script src="app.js?v=12"></script>
+    <script src="app.js?v=14"></script>
 </body>
 </html>
