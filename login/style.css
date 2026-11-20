@@ -120,7 +120,7 @@ html, body {
     pointer-events: none;
 }
 
-/* --- MINI PLAYER HORIZONTAL NO TOPO DIREITO (COM AFUNDADINHA INTERATIVA) --- */
+/* --- MINI PLAYER HORIZONTAL NO TOPO DIREITO --- */
 .top-music-player {
     display: flex;
     align-items: center;
@@ -293,7 +293,7 @@ html, body {
     color: #ffffff;
 }
 
-/* --- CARD DE AUTENTICAÇÃO (DIREITA, COM INTERATIVIDADE SUAVE) --- */
+/* --- CARD DE AUTENTICAÇÃO --- */
 .auth-card {
     width: 100%;
     max-width: 390px;
