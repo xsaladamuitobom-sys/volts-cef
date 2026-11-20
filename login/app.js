@@ -76,14 +76,8 @@
         btnSubmitRegister: document.getElementById('btnSubmitRegister')
     };
 
-    function emitToServer(eventName, payload = '', extraPayload = null) {
+    function emitToServer(eventName, payload = '') {
         if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
-            if (extraPayload !== null && extraPayload !== undefined) {
-                try {
-                    cef.emit(eventName, String(payload), String(extraPayload));
-                    return;
-                } catch (_) {}
-            }
             cef.emit(eventName, String(payload));
         }
     }
@@ -496,7 +490,7 @@
 
             clearFeedback();
             setLoading(true);
-            emitToServer('volts:register', `${pass1}|${pass2}`, pass1);
+            emitToServer('volts:register', `${pass1}|${pass2}`);
         });
     }
 
