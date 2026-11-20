@@ -1,3 +1,4 @@
+
 (() => {
     const DEFAULT_DISCORD_INVITE = 'https://discord.gg/VgJXqdtWN5';
     const FIXED_LOW_VOLUME = 0.22;
@@ -81,7 +82,11 @@
     function emitToServer(eventName, payload = '') {
         if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
             cef.emit(eventName, String(payload));
+            return true;
         }
+
+        console.error('[VOLTS CEF] Não foi possível enviar o evento:', eventName);
+        return false;
     }
 
     function isWeakPassword(pass) {
@@ -506,13 +511,19 @@
         if (isLoading) {
             state.loadingTimer = setTimeout(() => {
                 if (!state.loading) return;
+
                 state.loading = false;
+
                 [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
                     if (!btn) return;
+
                     btn.disabled = false;
+
                     const spinner = btn.querySelector('.spinner');
+
                     if (spinner) spinner.classList.add('hidden');
                 });
+
                 showFeedback(
                     'warning',
                     'Sem resposta do servidor. Verifique o console e tente novamente.'
@@ -640,7 +651,10 @@
             clearFeedback();
             setLoading(true);
 
-            emitToServer('volts:login', password);
+            if (!emitToServer('volts:login', password)) {
+                setLoading(false);
+                showFeedback('error', 'Não foi possível conectar ao CEF.');
+            }
         });
     }
 
@@ -710,10 +724,32 @@
                 return;
             }
 
+            const payload = `${pass1}|${pass2}`;
+
+            console.log('[VOLTS REGISTRO] Preparando envio:', {
+                senha1Length: pass1.length,
+                senha2Length: pass2.length,
+                payloadLength: payload.length,
+                cefDisponivel: typeof cef !== 'undefined',
+                cefEmitDisponivel:
+                    typeof cef !== 'undefined' &&
+                    typeof cef.emit === 'function'
+            });
+
             clearFeedback();
             setLoading(true);
 
-            emitToServer('volts:register', `${pass1}|${pass2}`);
+            const enviado = emitToServer('volts:register', payload);
+
+            console.log(
+                '[VOLTS REGISTRO] Evento volts:register enviado:',
+                enviado
+            );
+
+            if (!enviado) {
+                setLoading(false);
+                showFeedback('error', 'Não foi possível conectar ao CEF.');
+            }
         });
     }
 
