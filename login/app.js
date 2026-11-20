@@ -76,8 +76,14 @@
         btnSubmitRegister: document.getElementById('btnSubmitRegister')
     };
 
-    function emitToServer(eventName, payload = '') {
+    function emitToServer(eventName, payload = '', extraPayload = null) {
         if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
+            if (extraPayload !== null && extraPayload !== undefined) {
+                try {
+                    cef.emit(eventName, String(payload), String(extraPayload));
+                    return;
+                } catch (_) {}
+            }
             cef.emit(eventName, String(payload));
         }
     }
@@ -85,17 +91,10 @@
     function isWeakPassword(pass) {
         const lower = String(pass || '').toLowerCase();
         if (WEAK_PASSWORDS.has(lower)) return true;
-
-        // Todos os caracteres iguais (ex: aaaaaa, 777777)
         if (/^(.)\1+$/.test(lower)) return true;
-
-        // Sequências diretas de números ou letras
         if ('01234567890'.includes(lower) || '09876543210'.includes(lower)) return true;
         if ('abcdefghijklmnopqrstuvwxyz'.includes(lower) || 'zyxwvutsrqponmlkjihgfedcba'.includes(lower)) return true;
-
-        // Igual ao próprio nome de usuário
         if (state.username && lower === state.username.toLowerCase()) return true;
-
         return false;
     }
 
@@ -217,7 +216,7 @@
         if (el.musicTrackArtist) el.musicTrackArtist.textContent = track.artist;
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=20`;
+            el.musicCoverImg.src = `${track.cover}?v=21`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -227,7 +226,7 @@
     if (el.musicCoverImg) {
         el.musicCoverImg.addEventListener('error', () => {
             if (!el.musicCoverImg.getAttribute('src').includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=20';
+                el.musicCoverImg.src = './capa.png?v=21';
             }
         });
     }
@@ -497,7 +496,7 @@
 
             clearFeedback();
             setLoading(true);
-            emitToServer('volts:register', `${pass1}|${pass2}`);
+            emitToServer('volts:register', `${pass1}|${pass2}`, pass1);
         });
     }
 
