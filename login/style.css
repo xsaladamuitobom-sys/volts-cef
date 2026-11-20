@@ -2,7 +2,6 @@
     --font-display: 'Chakra Petch', 'Segoe UI', sans-serif;
     --font-body: 'Plus Jakarta Sans', 'Segoe UI', Roboto, sans-serif;
 
-    /* Roxo sombrio estilo Amaterasu */
     --amaterasu-deep: #3b0764;
     --amaterasu-dark: #4c1d95;
     --amaterasu-core: #5b21b6;
@@ -121,7 +120,7 @@ html, body {
     pointer-events: none;
 }
 
-/* --- MINI PLAYER HORIZONTAL NO TOPO DIREITO --- */
+/* --- MINI PLAYER HORIZONTAL NO TOPO DIREITO (COM AFUNDADINHA INTERATIVA) --- */
 .top-music-player {
     display: flex;
     align-items: center;
@@ -133,6 +132,19 @@ html, body {
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.65);
     flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.top-music-player:hover {
+    transform: translateY(1.5px) scale(0.99);
+    background: rgba(16, 12, 24, 0.92);
+    border-color: rgba(139, 92, 246, 0.42);
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.75), inset 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.top-music-player:active {
+    transform: translateY(2.5px) scale(0.98);
 }
 
 .top-cover-box {
@@ -197,16 +209,17 @@ html, body {
     display: grid;
     place-items: center;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    transition: background 0.14s ease, color 0.14s ease, transform 0.12s ease;
 }
 
 .m-ctrl-btn:hover {
     background: rgba(109, 40, 217, 0.28);
     color: #ffffff;
+    transform: translateY(1px) scale(0.95);
 }
 
 .m-ctrl-btn:active {
-    transform: scale(0.92);
+    transform: translateY(2px) scale(0.9);
 }
 
 .top-volume-badge {
@@ -250,7 +263,18 @@ html, body {
     height: auto;
     object-fit: contain;
     margin-bottom: 14px;
+    cursor: pointer;
     filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 22px rgba(91, 33, 182, 0.35));
+    transition: transform 0.16s ease, filter 0.16s ease;
+}
+
+.hero-logo:hover {
+    transform: translateY(2px) scale(0.985);
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 26px rgba(139, 92, 246, 0.5));
+}
+
+.hero-logo:active {
+    transform: translateY(3px) scale(0.97);
 }
 
 .hero-tagline {
@@ -261,9 +285,15 @@ html, body {
     color: rgba(244, 244, 248, 0.92);
     text-transform: uppercase;
     text-shadow: 0 3px 14px rgba(0, 0, 0, 0.95);
+    transition: transform 0.16s ease, color 0.16s ease;
 }
 
-/* --- CARD DE AUTENTICAÇÃO (DIREITA) --- */
+.hero-left:hover .hero-tagline {
+    transform: translateY(1px);
+    color: #ffffff;
+}
+
+/* --- CARD DE AUTENTICAÇÃO (DIREITA, COM INTERATIVIDADE SUAVE) --- */
 .auth-card {
     width: 100%;
     max-width: 390px;
@@ -276,6 +306,16 @@ html, body {
         0 0 32px rgba(59, 7, 100, 0.28),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.auth-card:hover {
+    transform: translateY(1.5px) scale(0.994);
+    border-color: rgba(139, 92, 246, 0.28);
+    box-shadow:
+        0 18px 46px rgba(0, 0, 0, 0.9),
+        0 0 36px rgba(76, 29, 149, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.11);
 }
 
 .tabs-bar {
@@ -302,12 +342,17 @@ html, body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: color 0.16s ease, background 0.16s ease;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.12s ease;
 }
 
 .tab-btn:hover:not(.active) {
     color: var(--text-primary);
     background: rgba(255, 255, 255, 0.03);
+    transform: translateY(1px);
+}
+
+.tab-btn:active {
+    transform: translateY(2px) scale(0.98);
 }
 
 .tab-btn.active {
@@ -369,13 +414,19 @@ html, body {
     border-radius: 7px;
     background: var(--input-bg);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, transform 0.14s ease;
+}
+
+.input-shell:not(.readonly):hover {
+    border-color: rgba(139, 92, 246, 0.34);
+    transform: translateY(1px);
 }
 
 .input-shell:focus-within {
     border-color: var(--amaterasu-accent);
     background: rgba(24, 16, 38, 0.94);
     box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.25);
+    transform: translateY(1px);
 }
 
 .input-shell.readonly {
@@ -420,13 +471,14 @@ html, body {
     display: grid;
     place-items: center;
     cursor: pointer;
-    transition: color 0.15s ease, background 0.15s ease;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.12s ease;
     flex-shrink: 0;
 }
 
 .eye-btn:hover {
     color: #ffffff;
     background: rgba(109, 40, 217, 0.22);
+    transform: scale(0.95);
 }
 
 .form-aux-row {
@@ -442,7 +494,6 @@ html, body {
     color: var(--text-muted);
 }
 
-/* Botão principal em roxo sombrio Amaterasu */
 .submit-btn {
     width: 100%;
     height: 44px;
@@ -461,17 +512,17 @@ html, body {
     justify-content: center;
     gap: 8px;
     box-shadow: 0 8px 22px rgba(59, 7, 100, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
-    transition: filter 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
+    transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
 }
 
 .submit-btn:hover:not(:disabled) {
     filter: brightness(1.14);
-    transform: translateY(-1px);
-    box-shadow: 0 10px 26px rgba(91, 33, 182, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    transform: translateY(1.5px) scale(0.99);
+    box-shadow: 0 4px 14px rgba(59, 7, 100, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .submit-btn:active:not(:disabled) {
-    transform: translateY(1px) scale(0.99);
+    transform: translateY(2.5px) scale(0.98);
 }
 
 .submit-btn:disabled {
@@ -526,17 +577,17 @@ html, body {
     align-items: center;
     justify-content: center;
     gap: 9px;
-    transition: background 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
 }
 
 .discord-wide-btn:hover {
     background: rgba(76, 29, 149, 0.28);
     border-color: rgba(139, 92, 246, 0.45);
-    transform: translateY(-1px);
+    transform: translateY(1.5px) scale(0.99);
 }
 
 .discord-wide-btn:active {
-    transform: scale(0.99);
+    transform: translateY(2.5px) scale(0.98);
 }
 
 .card-security-note {
