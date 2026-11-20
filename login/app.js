@@ -210,7 +210,7 @@
         if (el.musicTrackArtist) el.musicTrackArtist.textContent = track.artist;
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=21`;
+            el.musicCoverImg.src = `${track.cover}?v=22`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -220,7 +220,7 @@
     if (el.musicCoverImg) {
         el.musicCoverImg.addEventListener('error', () => {
             if (!el.musicCoverImg.getAttribute('src').includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=21';
+                el.musicCoverImg.src = './capa.png?v=22';
             }
         });
     }
