@@ -6,17 +6,20 @@
         {
             title: 'DANADA ME LIGANDO',
             artist: 'MC Cebezinho, MC Tuto e MC Kako',
-            src: './musica.mp3'
+            src: './musica.mp3',
+            cover: './capa1.jpg'
         },
         {
             title: 'Lobo da Madruga',
             artist: 'MC Poze do Rodo ft. Meno K, MC Rodrigo do CN, MC Ryan SP e Bielzin',
-            src: './musica2.mp3'
+            src: './musica2.mp3',
+            cover: './capa2.jpg'
         },
         {
             title: "LET'S GO 5",
             artist: 'MC IG',
-            src: './musica3.mp3'
+            src: './musica3.mp3',
+            cover: './capa3.jpg'
         }
     ];
 
@@ -52,6 +55,7 @@
         liveClock: document.getElementById('liveClock'),
         discordLink: document.getElementById('discordLink'),
         playerBox: document.getElementById('playerBox'),
+        musicCoverImg: document.getElementById('musicCoverImg'),
         btnPrevTrack: document.getElementById('btnPrevTrack'),
         btnPlayPause: document.getElementById('btnPlayPause'),
         btnNextTrack: document.getElementById('btnNextTrack'),
@@ -59,6 +63,9 @@
         iconPause: document.getElementById('iconPause'),
         musicTrackTitle: document.getElementById('musicTrackTitle'),
         musicTrackArtist: document.getElementById('musicTrackArtist'),
+        musicProgressFill: document.getElementById('musicProgressFill'),
+        musicCurrentTime: document.getElementById('musicCurrentTime'),
+        musicRemainingTime: document.getElementById('musicRemainingTime'),
         footerTipText: document.getElementById('footerTipText'),
         bgMusic: document.getElementById('bgMusic'),
         accountBadge: document.getElementById('accountBadge'),
@@ -169,6 +176,40 @@
         el.footerTipText.textContent = TIPS[state.tipIndex];
     }
 
+    function formatTime(seconds) {
+        if (!seconds || !isFinite(seconds) || seconds < 0) return '0:00';
+        const totalSec = Math.floor(seconds);
+        const mins = Math.floor(totalSec / 60);
+        const secs = totalSec % 60;
+        return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function updateProgressAndTime() {
+        if (!el.bgMusic) return;
+        const current = el.bgMusic.currentTime || 0;
+        const duration = el.bgMusic.duration;
+
+        if (el.musicCurrentTime) {
+            el.musicCurrentTime.textContent = formatTime(current);
+        }
+
+        if (!duration || !isFinite(duration) || duration <= 0) {
+            if (el.musicProgressFill) el.musicProgressFill.style.width = '0%';
+            if (el.musicRemainingTime) el.musicRemainingTime.textContent = '-0:00';
+            return;
+        }
+
+        const pct = Math.max(0, Math.min(100, (current / duration) * 100));
+        if (el.musicProgressFill) {
+            el.musicProgressFill.style.width = `${pct.toFixed(1)}%`;
+        }
+
+        const remaining = Math.max(0, duration - current);
+        if (el.musicRemainingTime) {
+            el.musicRemainingTime.textContent = `-${formatTime(remaining)}`;
+        }
+    }
+
     function applyLowVolume() {
         state.volume = FIXED_LOW_VOLUME;
         if (el.bgMusic) {
@@ -204,15 +245,31 @@
         return nextIdx;
     }
 
-    function updateTrackLabel() {
+    function updateTrackDisplay() {
         const track = PLAYLIST[state.trackIndex] || {
             title: 'Sem faixa',
             artist: 'VOLTS RP',
-            src: ''
+            src: '',
+            cover: './capa1.jpg'
         };
+
         if (el.musicTrackTitle) el.musicTrackTitle.textContent = track.title;
         if (el.musicTrackArtist) el.musicTrackArtist.textContent = track.artist;
+
+        if (el.musicCoverImg && track.cover) {
+            el.musicCoverImg.src = track.cover;
+            el.musicCoverImg.alt = `Capa de ${track.title}`;
+        }
+
         return track;
+    }
+
+    if (el.musicCoverImg) {
+        el.musicCoverImg.addEventListener('error', () => {
+            if (el.musicCoverImg.getAttribute('src') !== './capa1.jpg') {
+                el.musicCoverImg.src = './capa1.jpg';
+            }
+        });
     }
 
     function playAudioElement() {
@@ -227,7 +284,11 @@
     function loadTrack(index, autoplay = true) {
         if (!PLAYLIST.length || !el.bgMusic) return;
         state.trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
-        const track = updateTrackLabel();
+        const track = updateTrackDisplay();
+
+        if (el.musicProgressFill) el.musicProgressFill.style.width = '0%';
+        if (el.musicCurrentTime) el.musicCurrentTime.textContent = '0:00';
+        if (el.musicRemainingTime) el.musicRemainingTime.textContent = '-0:00';
 
         el.bgMusic.src = track.src;
         applyLowVolume();
@@ -287,7 +348,11 @@
     window.addEventListener('beforeunload', stopMusicCleanly);
 
     if (el.bgMusic) {
+        el.bgMusic.addEventListener('timeupdate', updateProgressAndTime);
+        el.bgMusic.addEventListener('loadedmetadata', updateProgressAndTime);
+
         el.bgMusic.addEventListener('ended', () => {
+            if (el.musicProgressFill) el.musicProgressFill.style.width = '100%';
             if (state.audioEnabled) {
                 nextTrack();
             } else {
