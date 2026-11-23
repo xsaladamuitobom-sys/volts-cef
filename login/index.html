@@ -15,11 +15,19 @@
 <body>
     <!-- CAMADA DE FUNDO: ATMOSFERA NOTURNA E TEMPESTADE VOLUMÉTRICA -->
     <div class="bg-layer" aria-hidden="true">
-        <div class="storm-sky"></div>
-        <div class="horizon-glow"></div>
-        <canvas id="stormCanvas" class="storm-canvas"></canvas>
-        <div class="storm-vignette"></div>
-    </div>
+    <video
+        id="bgVideo"
+        class="bg-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+    >
+        <source src="./fundo.mp4?v=31" type="video/mp4">
+    </video>
+    <div class="bg-dim"></div>
+</div>
 
     <!-- TOPO ESQUERDO: RELÓGIO E DATA -->
     <header class="hud-top-left" aria-label="Horário e data">
