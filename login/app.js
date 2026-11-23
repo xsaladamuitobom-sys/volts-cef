@@ -76,11 +76,12 @@
         maxPlayers: MAX_SERVER_SLOTS,
         loadingTimer: null,
         currentTipIndex: 0,
-        tipTimer: null
+        tipTimer: null,
+        readyEmitted: false
     };
 
     const el = {
-        stormCanvas: document.getElementById('stormCanvas'),
+        bgVideo: document.getElementById('bgVideo'),
 
         liveClock: document.getElementById('liveClock'),
         liveDate: document.getElementById('liveDate'),
@@ -132,326 +133,31 @@
     };
 
     /* =========================================================
-       TEMPESTADE VOLUMÉTRICA ORGÂNICA (CANVAS)
+       VÍDEO DE FUNDO (AUTOPLAY MUTADO + LIMPEZA SEGURA)
        ========================================================= */
 
-    const storm = (() => {
-        const canvas = el.stormCanvas;
-        if (!canvas) {
-            return { start() {}, stop() {} };
+    function startBackgroundVideo() {
+        if (!el.bgVideo) return;
+
+        el.bgVideo.muted = true;
+        el.bgVideo.loop = true;
+
+        const playPromise = el.bgVideo.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {});
         }
+    }
 
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            return { start() {}, stop() {} };
-        }
+    function stopBackgroundVideo() {
+        if (!el.bgVideo) return;
 
-        const prefersReduced =
-            typeof window.matchMedia === 'function' &&
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        let width = 0;
-        let height = 0;
-        let rafId = null;
-        let running = false;
-        let lastFrameTime = performance.now();
-        let nextEventTime = performance.now() + 1600;
-
-        let clouds = [];
-        let mistParticles = [];
-        let activeEvents = [];
-
-        function createCloudClusters() {
-            clouds = [];
-            const clusterCount = 11;
-
-            for (let i = 0; i < clusterCount; i++) {
-                clouds.push({
-                    x: (width / clusterCount) * i + (Math.random() - 0.5) * 140,
-                    y: height * (0.04 + Math.random() * 0.24),
-                    rx: 170 + Math.random() * 210,
-                    ry: 65 + Math.random() * 75,
-                    speed: (2.2 + Math.random() * 3.5) * (Math.random() > 0.3 ? 1 : -1),
-                    baseAlpha: 0.14 + Math.random() * 0.14,
-                    illumination: 0
-                });
-            }
-        }
-
-        function createMistParticles() {
-            mistParticles = [];
-            const count = 24;
-
-            for (let i = 0; i < count; i++) {
-                mistParticles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    radius: 0.7 + Math.random() * 1.4,
-                    vx: -6 - Math.random() * 10,
-                    vy: 14 + Math.random() * 22,
-                    alpha: 0.04 + Math.random() * 0.08
-                });
-            }
-        }
-
-        function resize() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = Math.floor(width * dpr);
-            canvas.height = Math.floor(height * dpr);
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            createCloudClusters();
-            createMistParticles();
-        }
-
-        function buildOrganicPath(x1, y1, x2, y2, displace, minStep = 9) {
-            if (displace < minStep) {
-                return [
-                    { x: x1, y: y1 },
-                    { x: x2, y: y2 }
-                ];
-            }
-
-            const midX = (x1 + x2) * 0.5 + (Math.random() - 0.5) * displace;
-            const midY = (y1 + y2) * 0.5 + (Math.random() - 0.5) * displace * 0.55;
-
-            const left = buildOrganicPath(x1, y1, midX, midY, displace * 0.52, minStep);
-            const right = buildOrganicPath(midX, midY, x2, y2, displace * 0.52, minStep);
-
-            return left.slice(0, -1).concat(right);
-        }
-
-        function illuminateNearbyClouds(originX, originY, radius, strength) {
-            clouds.forEach((cloud) => {
-                const dx = cloud.x - originX;
-                const dy = cloud.y - originY;
-                const dist = Math.hypot(dx, dy);
-                if (dist < radius) {
-                    const falloff = 1 - dist / radius;
-                    cloud.illumination = Math.min(1, cloud.illumination + falloff * strength);
-                }
-            });
-        }
-
-        function spawnStormEvent(now) {
-            const originX = width * (0.16 + Math.random() * 0.68);
-            const originY = height * (0.04 + Math.random() * 0.14);
-
-            // 55% das vezes ocorre clarão interno nas nuvens (sheet lightning),
-            // 45% ocorre descarga com raio visível + clarão volumétrico.
-            const hasVisibleBolt = Math.random() < 0.45;
-
-            let mainBolt = null;
-            const forks = [];
-
-            if (hasVisibleBolt) {
-                const endX = originX + (Math.random() - 0.5) * (width * 0.22);
-                const endY = height * (0.34 + Math.random() * 0.28);
-
-                mainBolt = buildOrganicPath(
-                    originX,
-                    originY,
-                    endX,
-                    endY,
-                    Math.min(105, width * 0.075),
-                    10
-                );
-
-                const forkTotal = 1 + Math.floor(Math.random() * 2);
-                for (let f = 0; f < forkTotal; f++) {
-                    const startIdx = Math.floor(mainBolt.length * (0.25 + Math.random() * 0.45));
-                    const node = mainBolt[startIdx];
-                    if (!node) continue;
-
-                    const dir = Math.random() > 0.5 ? 1 : -1;
-                    const fEndX = node.x + dir * (40 + Math.random() * 85);
-                    const fEndY = node.y + (45 + Math.random() * 85);
-
-                    forks.push(
-                        buildOrganicPath(node.x, node.y, fEndX, fEndY, 30, 9)
-                    );
-                }
-            }
-
-            activeEvents.push({
-                createdAt: now,
-                duration: hasVisibleBolt ? (340 + Math.random() * 180) : (480 + Math.random() * 260),
-                doubleFlicker: Math.random() > 0.45,
-                originX,
-                originY,
-                hasVisibleBolt,
-                mainBolt,
-                forks
-            });
-        }
-
-        function drawTaperedBolt(points, maxWidth, coreAlpha, haloAlpha) {
-            if (!points || points.length < 2) return;
-
-            const total = points.length - 1;
-
-            for (let i = 0; i < total; i++) {
-                const progress = i / total;
-                const taper = Math.max(0.18, 1 - progress * 0.82);
-
-                // Halo dourado/âmbar externo
-                ctx.beginPath();
-                ctx.moveTo(points[i].x, points[i].y);
-                ctx.lineTo(points[i + 1].x, points[i + 1].y);
-                ctx.lineCap = 'round';
-                ctx.lineWidth = maxWidth * 3.1 * taper;
-                ctx.strokeStyle = `rgba(245, 158, 11, ${haloAlpha * taper})`;
-                ctx.stroke();
-
-                // Filamento interno quente
-                ctx.beginPath();
-                ctx.moveTo(points[i].x, points[i].y);
-                ctx.lineTo(points[i + 1].x, points[i + 1].y);
-                ctx.lineCap = 'round';
-                ctx.lineWidth = maxWidth * taper;
-                ctx.strokeStyle = `rgba(255, 250, 232, ${coreAlpha * taper})`;
-                ctx.stroke();
-            }
-        }
-
-        function updateAndDrawClouds(dt) {
-            clouds.forEach((cloud) => {
-                cloud.x += cloud.speed * dt;
-                if (cloud.x - cloud.rx > width + 120) cloud.x = -cloud.rx - 80;
-                if (cloud.x + cloud.rx < -120) cloud.x = width + cloud.rx + 80;
-
-                // Decaimento suave da luz interna da nuvem
-                cloud.illumination *= Math.pow(0.06, dt);
-
-                ctx.save();
-                ctx.translate(cloud.x, cloud.y);
-                ctx.scale(1, cloud.ry / cloud.rx);
-
-                const grad = ctx.createRadialGradient(0, 0, cloud.rx * 0.08, 0, 0, cloud.rx);
-
-                if (cloud.illumination > 0.01) {
-                    const glow = cloud.illumination;
-                    grad.addColorStop(0, `rgba(251, 191, 36, ${0.22 * glow})`);
-                    grad.addColorStop(0.45, `rgba(217, 119, 6, ${0.11 * glow})`);
-                    grad.addColorStop(1, 'rgba(10, 14, 22, 0)');
-                } else {
-                    grad.addColorStop(0, `rgba(22, 28, 42, ${cloud.baseAlpha})`);
-                    grad.addColorStop(0.6, `rgba(14, 18, 28, ${cloud.baseAlpha * 0.5})`);
-                    grad.addColorStop(1, 'rgba(7, 9, 14, 0)');
-                }
-
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(0, 0, cloud.rx, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-        }
-
-        function updateAndDrawMist(dt) {
-            mistParticles.forEach((p) => {
-                p.x += p.vx * dt;
-                p.y += p.vy * dt;
-
-                if (p.y > height + 10) {
-                    p.y = -10;
-                    p.x = Math.random() * width;
-                }
-                if (p.x < -10) {
-                    p.x = width + 10;
-                }
-
-                ctx.fillStyle = `rgba(226, 232, 240, ${p.alpha})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
-
-        function render(now) {
-            if (!running) return;
-
-            const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
-            lastFrameTime = now;
-
-            ctx.clearRect(0, 0, width, height);
-
-            if (!prefersReduced && now >= nextEventTime) {
-                spawnStormEvent(now);
-                nextEventTime = now + 5200 + Math.random() * 6800;
-            }
-
-            activeEvents = activeEvents.filter((ev) => {
-                const elapsed = now - ev.createdAt;
-                if (elapsed >= ev.duration) return false;
-
-                const t = elapsed / ev.duration;
-                let energy = Math.pow(1 - t, 2.1);
-
-                // Oscilação orgânica de retorno (re-strike)
-                if (ev.doubleFlicker && t > 0.24 && t < 0.44) {
-                    energy *= 0.22;
-                } else if (ev.doubleFlicker && t >= 0.44 && t < 0.56) {
-                    energy = Math.min(1, energy * 1.45);
-                }
-
-                illuminateNearbyClouds(
-                    ev.originX,
-                    ev.originY,
-                    Math.max(360, width * 0.34),
-                    energy * (ev.hasVisibleBolt ? 0.95 : 0.65)
-                );
-
-                ev.currentEnergy = energy;
-                return true;
-            });
-
-            // 1. Nuvens atmosféricas (recebem iluminação interna)
-            updateAndDrawClouds(dt);
-
-            // 2. Descargas elétricas afiladas (quando visíveis)
-            activeEvents.forEach((ev) => {
-                if (!ev.hasVisibleBolt || !ev.mainBolt) return;
-
-                const e = ev.currentEnergy || 0;
-                drawTaperedBolt(ev.mainBolt, 1.35, 0.72 * e, 0.26 * e);
-
-                ev.forks.forEach((fork) => {
-                    drawTaperedBolt(fork, 0.75, 0.45 * e, 0.16 * e);
-                });
-            });
-
-            // 3. Partículas sutis de névoa noturna
-            if (!prefersReduced) {
-                updateAndDrawMist(dt);
-            }
-
-            rafId = window.requestAnimationFrame(render);
-        }
-
-        function start() {
-            if (running) return;
-            running = true;
-            lastFrameTime = performance.now();
-            resize();
-            window.addEventListener('resize', resize, { passive: true });
-            rafId = window.requestAnimationFrame(render);
-        }
-
-        function stop() {
-            running = false;
-            window.removeEventListener('resize', resize);
-            if (rafId !== null) {
-                window.cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-            activeEvents = [];
-        }
-
-        return { start, stop };
-    })();
+        try {
+            el.bgVideo.pause();
+            el.bgVideo.removeAttribute('src');
+            el.bgVideo.querySelectorAll('source').forEach((s) => s.remove());
+            el.bgVideo.load();
+        } catch (_) {}
+    }
 
     /* =========================================================
        COMUNICAÇÃO COM O SERVIDOR
@@ -465,6 +171,12 @@
 
         console.error('[VOLTS CEF] Não foi possível enviar o evento:', eventName);
         return false;
+    }
+
+    function emitReadyOnce() {
+        if (state.readyEmitted) return;
+        state.readyEmitted = true;
+        emitToServer('volts:ready', '1');
     }
 
     /* =========================================================
@@ -732,7 +444,7 @@
         }
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=30`;
+            el.musicCoverImg.src = `${track.cover}?v=31`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -743,7 +455,7 @@
         el.musicCoverImg.addEventListener('error', () => {
             const currentSrc = el.musicCoverImg.getAttribute('src') || '';
             if (!currentSrc.includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=30';
+                el.musicCoverImg.src = './capa.png?v=31';
             }
         });
     }
@@ -810,7 +522,7 @@
     }
 
     function cleanupOnUnload() {
-        storm.stop();
+        stopBackgroundVideo();
         state.audioEnabled = false;
         syncPlayerIcons(false);
 
@@ -845,6 +557,9 @@
     }
 
     document.addEventListener('pointerdown', () => {
+        if (el.bgVideo && el.bgVideo.paused) {
+            startBackgroundVideo();
+        }
         if (state.audioEnabled && el.bgMusic && el.bgMusic.paused && el.bgMusic.src) {
             playAudioElement();
         }
@@ -1136,25 +851,32 @@
     }
 
     /* =========================================================
-       INICIALIZAÇÃO
+       INICIALIZAÇÃO (SEM TRAVAR NO DOWNLOAD DO VÍDEO)
        ========================================================= */
 
-    storm.start();
+    function bootstrapUI() {
+        updateClockAndDate();
+        setInterval(updateClockAndDate, 1000);
 
-    updateClockAndDate();
-    setInterval(updateClockAndDate, 1000);
+        setServerOnlineState(true);
+        updatePlayersCounter(0, MAX_SERVER_SLOTS);
+        syncVolumeUI();
+        resetAllPasswordInputs();
+        initializeCityTips();
 
-    setServerOnlineState(true);
-    updatePlayersCounter(0, MAX_SERVER_SLOTS);
-    syncVolumeUI();
-    resetAllPasswordInputs();
-    initializeCityTips();
+        startBackgroundVideo();
 
-    window.addEventListener('load', () => {
         const startIndex = getRandomTrackIndex();
         loadTrack(startIndex, true);
-        emitToServer('volts:ready', '1');
-    });
+
+        emitReadyOnce();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootstrapUI, { once: true });
+    } else {
+        bootstrapUI();
+    }
 
     /* =========================================================
        EVENTOS RECEBIDOS DO PAWN (CEF)
