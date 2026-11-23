@@ -33,10 +33,21 @@
 
     const CITY_TIPS = [
         'Respeite as regras do servidor e ajude a manter a experiência de todos.',
-        'Construa sua história. Suas escolhas definem seu caminho na cidade.',
-        'Conheça os locais da cidade antes de se aventurar em novas oportunidades.',
-        'Trabalhe, conquiste seu espaço e desenvolva sua trajetória no roleplay.',
-        'Boas histórias são construídas com interação, respeito e criatividade.'
+        'Valorize a vida do seu personagem em todas as situações dentro da cidade.',
+        'Construa sua história com calma; suas escolhas definem seu futuro em Los Santos.',
+        'Utilize os canais de comunicação de forma coerente com a interpretação do personagem.',
+        'Mantenha o respeito com todos os jogadores e com a equipe administrativa.',
+        'Explore os empregos legais da cidade para conquistar seus primeiros bens.',
+        'Evite atitudes antidesportivas; o bom roleplay depende da colaboração de todos.',
+        'Em caso de dúvidas ou problemas, acione o suporte oficial da cidade.',
+        'Dirija com prudência pelas avenidas e respeite a sinalização de trânsito.',
+        'Nunca compartilhe sua senha com terceiros; a segurança da conta é sua responsabilidade.',
+        'Participe dos eventos comunitários e fortaleça suas conexões na cidade.',
+        'Guarde seu dinheiro no banco regularmente para evitar prejuízos desnecessários.',
+        'Observe o ambiente antes de agir e tome decisões estratégicas no seu dia a dia.',
+        'Denuncie qualquer irregularidade ou falha técnica pelos canais oficiais do servidor.',
+        'Trabalhe em equipe, faça aliados e construa sua reputação passo a passo.',
+        'Boas histórias nascem da criatividade, da imersão e do respeito mútuo.'
     ];
 
     const WEAK_PASSWORDS = new Set([
@@ -241,7 +252,7 @@
     }
 
     /* =========================================================
-       DICAS DA CIDADE
+       DICAS DA CIDADE (16 DICAS)
        ========================================================= */
 
     function renderCityTip(index) {
@@ -397,7 +408,7 @@
         }
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=25`;
+            el.musicCoverImg.src = `${track.cover}?v=26`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -408,7 +419,7 @@
         el.musicCoverImg.addEventListener('error', () => {
             const currentSrc = el.musicCoverImg.getAttribute('src') || '';
             if (!currentSrc.includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=25';
+                el.musicCoverImg.src = './capa.png?v=26';
             }
         });
     }
