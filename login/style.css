@@ -30,7 +30,7 @@ body {
     height: 100%;
     overflow: hidden;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #07080b;
+    background: transparent;
     color: var(--text-primary);
     user-select: none;
     -webkit-font-smoothing: antialiased;
@@ -41,7 +41,7 @@ body {
 }
 
 /* =========================================================
-   CAMADA DE FUNDO (CLARA NA MEDIDA CERTA SEM ESCURECER DEMAIS)
+   CAMADA DE FUNDO (APENAS A IMAGEM EM 70% DE OPACIDADE)
    ========================================================= */
 
 .bg-layer {
@@ -49,25 +49,22 @@ body {
     inset: 0;
     z-index: 0;
     pointer-events: none;
+    background: transparent;
 }
 
 .bg-photo {
     position: absolute;
     inset: 0;
-    background-color: #0a0b0f;
+    background-color: transparent;
     background-image: var(--bg-image);
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    opacity: 0.72;
+    opacity: 0.70;
 }
 
 .bg-vignette {
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(circle at center, rgba(6, 7, 10, 0.04) 0%, rgba(6, 7, 10, 0.42) 100%),
-        linear-gradient(180deg, rgba(6, 7, 10, 0.34) 0%, transparent 22%, transparent 78%, rgba(6, 7, 10, 0.46) 100%);
+    display: none;
 }
 
 /* =========================================================
