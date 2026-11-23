@@ -1,5 +1,5 @@
 :root {
-    --bg-image: url('./fundo.png');
+    --bg-image: url('./fundo.png?v=28');
     --gold: #f59e0b;
     --gold-bright: #fbbf24;
     --gold-deep: #92400e;
@@ -30,7 +30,7 @@ body {
     height: 100%;
     overflow: hidden;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: transparent;
+    background-color: #050608;
     color: var(--text-primary);
     user-select: none;
     -webkit-font-smoothing: antialiased;
@@ -41,7 +41,7 @@ body {
 }
 
 /* =========================================================
-   CAMADA DE FUNDO (APENAS A IMAGEM EM 70% DE OPACIDADE)
+   CAMADA DE FUNDO (NITIDEZ E CONTRASTE SEM LAVAR A IMAGEM)
    ========================================================= */
 
 .bg-layer {
@@ -49,22 +49,27 @@ body {
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: transparent;
+    background-color: #050608;
 }
 
 .bg-photo {
     position: absolute;
     inset: 0;
-    background-color: transparent;
+    background-color: #050608;
     background-image: var(--bg-image);
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    opacity: 0.70;
+    opacity: 1;
+    filter: brightness(0.86) contrast(1.08) saturate(1.06);
 }
 
 .bg-vignette {
-    display: none;
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 42% 52%, transparent 38%, rgba(5, 6, 8, 0.52) 100%),
+        linear-gradient(180deg, rgba(5, 6, 8, 0.42) 0%, transparent 18%, transparent 82%, rgba(5, 6, 8, 0.48) 100%);
 }
 
 /* =========================================================
