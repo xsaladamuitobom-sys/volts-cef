@@ -1,5 +1,5 @@
 :root {
-    --bg-image: url('./fundo.jpg');
+    --bg-image: url('./fundo.png');
     --crimson: #e11d2a;
     --crimson-bright: #ff2a38;
     --crimson-dark: #881318;
@@ -30,7 +30,7 @@ body {
     height: 100%;
     overflow: hidden;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #08090c;
+    background-color: #050608; /* Um fundo bem escuro e sólido para receber o fundo de 55% */
     color: var(--text-primary);
     user-select: none;
     -webkit-font-smoothing: antialiased;
@@ -41,7 +41,7 @@ body {
 }
 
 /* =========================================================
-   CAMADA DE FUNDO
+   CAMADA DE FUNDO (55% OPACIDADE)
    ========================================================= */
 
 .bg-layer {
@@ -54,23 +54,24 @@ body {
 .bg-photo {
     position: absolute;
     inset: 0;
-    background-color: #0a0b0f;
+    background-color: #000000;
     background-image:
-        radial-gradient(circle at 65% 35%, rgba(225, 29, 42, 0.14), transparent 52%),
+        radial-gradient(circle at 65% 35%, rgba(225, 29, 42, 0.12), transparent 52%),
         linear-gradient(135deg, #0b0d13 0%, #12151f 50%, #090a0d 100%),
         var(--bg-image);
     background-blend-mode: normal, overlay, normal;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
+    opacity: 0.55; /* IMPORTANTE: Mantém a imagem apenas em 55% de visibilidade */
 }
 
 .bg-vignette {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at center, rgba(6, 7, 10, 0.12) 0%, rgba(6, 7, 10, 0.72) 100%),
-        linear-gradient(180deg, rgba(6, 7, 10, 0.58) 0%, transparent 22%, transparent 76%, rgba(6, 7, 10, 0.78) 100%);
+        radial-gradient(circle at center, rgba(6, 7, 10, 0.15) 0%, rgba(6, 7, 10, 0.76) 100%),
+        linear-gradient(180deg, rgba(6, 7, 10, 0.6) 0%, transparent 25%, transparent 75%, rgba(6, 7, 10, 0.8) 100%);
 }
 
 /* =========================================================
@@ -347,7 +348,6 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* Detalhe luminoso vermelho no canto inferior direito */
 .auth-corner-glow {
     position: absolute;
     right: -1px;
@@ -363,7 +363,6 @@ body {
     filter: drop-shadow(0 0 8px var(--crimson-glow));
 }
 
-/* Pequeno chanfro inferior central */
 .auth-bottom-notch {
     position: absolute;
     left: 50%;
@@ -377,7 +376,6 @@ body {
     pointer-events: none;
 }
 
-/* Abas Entrar / Criar Conta */
 .tabs-bar {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -430,7 +428,6 @@ body {
     box-shadow: 0 0 12px var(--crimson-glow);
 }
 
-/* Corpo do Formulário */
 .auth-body {
     padding: 24px 28px 28px;
 }
@@ -559,7 +556,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Lembrar-me e Esqueceu sua senha */
 .form-options {
     display: flex;
     align-items: center;
@@ -628,7 +624,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Botão Principal */
 .submit-btn {
     margin-top: 6px;
     height: 46px;
