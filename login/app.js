@@ -1,8 +1,14 @@
-
 (() => {
-    const FIXED_LOW_VOLUME = 0.22;
+    const DEFAULT_VOLUME = 0.22;
     const REQUEST_TIMEOUT_MS = 12000;
     const TIP_INTERVAL_MS = 9000;
+    const MAX_SERVER_SLOTS = 50;
+
+    const MONTHS_PT = [
+        'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL',
+        'MAIO', 'JUNHO', 'JULHO', 'AGOSTO',
+        'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
+    ];
 
     const PLAYLIST = [
         {
@@ -26,12 +32,11 @@
     ];
 
     const CITY_TIPS = [
+        'Respeite as regras do servidor e ajude a manter a experiência de todos.',
         'Construa sua história. Suas escolhas definem seu caminho na cidade.',
-        'Respeite as regras de interpretação e valorize a experiência de todos.',
-        'Conheça a cidade antes de se aventurar em novas oportunidades.',
-        'Trabalhe, conquiste seu espaço e desenvolva sua trajetória.',
-        'Boas histórias são construídas com interação e criatividade.',
-        'Cada decisão pode mudar o rumo da sua vida na cidade.'
+        'Conheça os locais da cidade antes de se aventurar em novas oportunidades.',
+        'Trabalhe, conquiste seu espaço e desenvolva sua trajetória no roleplay.',
+        'Boas histórias são construídas com interação, respeito e criatividade.'
     ];
 
     const WEAK_PASSWORDS = new Set([
@@ -53,29 +58,30 @@
         audioEnabled: true,
         isPlaying: false,
         trackIndex: 0,
-        volume: FIXED_LOW_VOLUME,
+        volume: DEFAULT_VOLUME,
+        lastNonZeroVolume: DEFAULT_VOLUME,
         serverOnline: true,
+        playersOnline: 0,
+        maxPlayers: MAX_SERVER_SLOTS,
         loadingTimer: null,
         currentTipIndex: 0,
         tipTimer: null
     };
 
     const el = {
-        clockPill: document.getElementById('clockPill'),
         liveClock: document.getElementById('liveClock'),
+        liveDate: document.getElementById('liveDate'),
 
-        playerBox: document.getElementById('playerBox'),
-        musicCoverImg: document.getElementById('musicCoverImg'),
-        btnPrevTrack: document.getElementById('btnPrevTrack'),
-        btnPlayPause: document.getElementById('btnPlayPause'),
-        btnNextTrack: document.getElementById('btnNextTrack'),
-        iconPlay: document.getElementById('iconPlay'),
-        iconPause: document.getElementById('iconPause'),
-        musicTrackTitle: document.getElementById('musicTrackTitle'),
-        musicTrackArtist: document.getElementById('musicTrackArtist'),
-        bgMusic: document.getElementById('bgMusic'),
+        serverStatusBox: document.getElementById('serverStatusBox'),
+        serverStatusText: document.getElementById('serverStatusText'),
+        playerCountText: document.getElementById('playerCountText'),
 
-        accountBadge: document.getElementById('accountBadge'),
+        cityTipText: document.getElementById('cityTipText'),
+        cityTipCounter: document.getElementById('cityTipCounter'),
+        cityTipSegments: document.getElementById('cityTipSegments'),
+        btnPrevTip: document.getElementById('btnPrevTip'),
+        btnNextTip: document.getElementById('btnNextTip'),
+
         tabLogin: document.getElementById('tabLogin'),
         tabRegister: document.getElementById('tabRegister'),
         feedbackBox: document.getElementById('feedbackBox'),
@@ -90,12 +96,26 @@
         regPassword: document.getElementById('regPassword'),
         regPasswordConfirm: document.getElementById('regPasswordConfirm'),
 
+        rememberMe: document.getElementById('rememberMe'),
+        btnForgotPass: document.getElementById('btnForgotPass'),
+
         btnSubmitLogin: document.getElementById('btnSubmitLogin'),
         btnSubmitRegister: document.getElementById('btnSubmitRegister'),
 
-        cityTip: document.getElementById('cityTip'),
-        cityTipNumber: document.getElementById('cityTipNumber'),
-        cityTipProgress: document.getElementById('cityTipProgress')
+        playerBox: document.getElementById('playerBox'),
+        musicCoverImg: document.getElementById('musicCoverImg'),
+        musicTrackTitle: document.getElementById('musicTrackTitle'),
+        musicTrackArtist: document.getElementById('musicTrackArtist'),
+        btnPrevTrack: document.getElementById('btnPrevTrack'),
+        btnPlayPause: document.getElementById('btnPlayPause'),
+        btnNextTrack: document.getElementById('btnNextTrack'),
+        iconPlay: document.getElementById('iconPlay'),
+        iconPause: document.getElementById('iconPause'),
+        btnMuteToggle: document.getElementById('btnMuteToggle'),
+        iconVolOn: document.getElementById('iconVolOn'),
+        iconVolOff: document.getElementById('iconVolOff'),
+        volumeSlider: document.getElementById('volumeSlider'),
+        bgMusic: document.getElementById('bgMusic')
     };
 
     /* =========================================================
@@ -103,19 +123,12 @@
        ========================================================= */
 
     function emitToServer(eventName, payload = '') {
-        if (
-            typeof cef !== 'undefined' &&
-            typeof cef.emit === 'function'
-        ) {
+        if (typeof cef !== 'undefined' && typeof cef.emit === 'function') {
             cef.emit(eventName, String(payload));
             return true;
         }
 
-        console.error(
-            '[VOLTS CEF] Não foi possível enviar o evento:',
-            eventName
-        );
-
+        console.error('[VOLTS CEF] Não foi possível enviar o evento:', eventName);
         return false;
     }
 
@@ -129,10 +142,7 @@
         if (WEAK_PASSWORDS.has(lower)) return true;
         if (/^(.)\1+$/.test(lower)) return true;
 
-        if (
-            '01234567890'.includes(lower) ||
-            '09876543210'.includes(lower)
-        ) {
+        if ('01234567890'.includes(lower) || '09876543210'.includes(lower)) {
             return true;
         }
 
@@ -143,10 +153,7 @@
             return true;
         }
 
-        if (
-            state.username &&
-            lower === state.username.toLowerCase()
-        ) {
+        if (state.username && lower === state.username.toLowerCase()) {
             return true;
         }
 
@@ -154,130 +161,201 @@
     }
 
     /* =========================================================
-       STATUS E RELÓGIO
+       LEMBRAR-ME (LOCALSTORAGE)
        ========================================================= */
 
-    function setClockDotState(isOnline) {
-        state.serverOnline = Boolean(isOnline);
-
-        if (!el.clockPill) return;
-
-        el.clockPill.classList.toggle(
-            'is-online',
-            state.serverOnline
-        );
-
-        el.clockPill.classList.toggle(
-            'is-offline',
-            !state.serverOnline
-        );
+    function getRememberKey(username) {
+        return `volts_remember_${String(username || '').toLowerCase()}`;
     }
 
-    function updateClock() {
-        if (!el.liveClock) return;
+    function loadRememberedPassword(username) {
+        if (!username || !el.rememberMe || !el.loginPassword) return;
 
+        try {
+            const saved = localStorage.getItem(getRememberKey(username));
+            if (saved) {
+                el.loginPassword.value = saved;
+                el.rememberMe.checked = true;
+            } else {
+                el.rememberMe.checked = false;
+            }
+        } catch (_) {}
+    }
+
+    function syncRememberedPassword(username, password) {
+        if (!username || !el.rememberMe) return;
+
+        try {
+            if (el.rememberMe.checked && password) {
+                localStorage.setItem(getRememberKey(username), password);
+            } else {
+                localStorage.removeItem(getRememberKey(username));
+            }
+        } catch (_) {}
+    }
+
+    /* =========================================================
+       RELÓGIO, DATA, STATUS E CONTADOR DE JOGADORES
+       ========================================================= */
+
+    function updateClockAndDate() {
         const now = new Date();
 
-        el.liveClock.textContent = now
-            .toTimeString()
-            .slice(0, 8);
+        if (el.liveClock) {
+            el.liveClock.textContent = now.toTimeString().slice(0, 8);
+        }
+
+        if (el.liveDate) {
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = MONTHS_PT[now.getMonth()] || 'JANEIRO';
+            const year = now.getFullYear();
+            el.liveDate.textContent = `${day} DE ${month}, ${year}`;
+        }
+    }
+
+    function setServerOnlineState(isOnline) {
+        state.serverOnline = Boolean(isOnline);
+
+        if (el.serverStatusBox) {
+            el.serverStatusBox.classList.toggle('is-online', state.serverOnline);
+            el.serverStatusBox.classList.toggle('is-offline', !state.serverOnline);
+        }
+
+        if (el.serverStatusText) {
+            el.serverStatusText.textContent = state.serverOnline
+                ? 'SERVIDOR ONLINE'
+                : 'SERVIDOR OFFLINE';
+        }
+    }
+
+    function updatePlayersCounter(online, maxSlots = MAX_SERVER_SLOTS) {
+        const safeOnline = Math.max(0, Number(online) || 0);
+        const safeMax = Math.max(1, Number(maxSlots) || MAX_SERVER_SLOTS);
+
+        state.playersOnline = safeOnline;
+        state.maxPlayers = safeMax;
+
+        if (el.playerCountText) {
+            el.playerCountText.textContent = `JOGADORES: ${safeOnline}/${safeMax}`;
+        }
     }
 
     /* =========================================================
        DICAS DA CIDADE
        ========================================================= */
 
-    function updateTipProgress() {
-        if (!el.cityTipProgress) return;
+    function renderCityTip(index) {
+        if (!CITY_TIPS.length) return;
 
-        const progress = el.cityTipProgress;
+        state.currentTipIndex = ((index % CITY_TIPS.length) + CITY_TIPS.length) % CITY_TIPS.length;
 
-        progress.style.transition = 'none';
-        progress.style.width = '0%';
-
-        // Reinicia a animação da barra.
-        void progress.offsetWidth;
-
-        progress.style.transition =
-            `width ${TIP_INTERVAL_MS}ms linear`;
-
-        progress.style.width = '100%';
-    }
-
-    function updateCityTip() {
-        if (!el.cityTip || CITY_TIPS.length === 0) return;
-
-        state.currentTipIndex =
-            (state.currentTipIndex + 1) % CITY_TIPS.length;
-
-        el.cityTip.textContent =
-            CITY_TIPS[state.currentTipIndex];
-
-        if (el.cityTipNumber) {
-            el.cityTipNumber.textContent =
-                `/// ${String(state.currentTipIndex + 1).padStart(2, '0')}`;
+        if (el.cityTipText) {
+            el.cityTipText.textContent = CITY_TIPS[state.currentTipIndex];
         }
 
-        updateTipProgress();
-    }
-
-    function initializeCityTips() {
-        if (!el.cityTip) return;
-
-        state.currentTipIndex = 0;
-
-        el.cityTip.textContent = CITY_TIPS[0];
-
-        if (el.cityTipNumber) {
-            el.cityTipNumber.textContent = '/// 01';
+        if (el.cityTipCounter) {
+            const currentStr = String(state.currentTipIndex + 1).padStart(2, '0');
+            const totalStr = String(CITY_TIPS.length).padStart(2, '0');
+            el.cityTipCounter.textContent = `${currentStr} / ${totalStr}`;
         }
 
-        updateTipProgress();
+        if (el.cityTipSegments) {
+            el.cityTipSegments.querySelectorAll('.tip-seg').forEach((seg, idx) => {
+                seg.classList.toggle('active', idx === state.currentTipIndex);
+            });
+        }
+    }
 
+    function restartTipTimer() {
         if (state.tipTimer) {
             clearInterval(state.tipTimer);
         }
 
-        state.tipTimer = setInterval(
-            updateCityTip,
-            TIP_INTERVAL_MS
-        );
+        state.tipTimer = setInterval(() => {
+            renderCityTip(state.currentTipIndex + 1);
+        }, TIP_INTERVAL_MS);
+    }
+
+    function initializeCityTips() {
+        renderCityTip(0);
+        restartTipTimer();
+
+        if (el.btnPrevTip) {
+            el.btnPrevTip.addEventListener('click', () => {
+                renderCityTip(state.currentTipIndex - 1);
+                restartTipTimer();
+            });
+        }
+
+        if (el.btnNextTip) {
+            el.btnNextTip.addEventListener('click', () => {
+                renderCityTip(state.currentTipIndex + 1);
+                restartTipTimer();
+            });
+        }
+
+        if (el.cityTipSegments) {
+            el.cityTipSegments.querySelectorAll('.tip-seg').forEach((seg) => {
+                seg.addEventListener('click', () => {
+                    const idx = Number(seg.getAttribute('data-index')) || 0;
+                    renderCityTip(idx);
+                    restartTipTimer();
+                });
+            });
+        }
     }
 
     /* =========================================================
-       SISTEMA DE MÚSICA
+       SISTEMA DE MÚSICA (VOLTS RADIO)
        ========================================================= */
 
-    function applyLowVolume() {
-        state.volume = FIXED_LOW_VOLUME;
+    function syncVolumeUI() {
+        const pct = Math.round(state.volume * 100);
+        const isMuted = pct === 0;
 
         if (el.bgMusic) {
             el.bgMusic.volume = state.volume;
+            el.bgMusic.muted = isMuted;
         }
+
+        if (el.volumeSlider) {
+            el.volumeSlider.value = String(pct);
+            el.volumeSlider.style.setProperty('--vol-pct', `${pct}%`);
+        }
+
+        if (el.iconVolOn) {
+            el.iconVolOn.classList.toggle('hidden', isMuted);
+        }
+
+        if (el.iconVolOff) {
+            el.iconVolOff.classList.toggle('hidden', !isMuted);
+        }
+    }
+
+    function setVolumeLevel(newVol) {
+        const clamped = Math.max(0, Math.min(1, Number(newVol) || 0));
+        state.volume = clamped;
+
+        if (clamped > 0) {
+            state.lastNonZeroVolume = clamped;
+        }
+
+        syncVolumeUI();
     }
 
     function syncPlayerIcons(playing) {
         state.isPlaying = Boolean(playing);
 
         if (el.iconPlay) {
-            el.iconPlay.classList.toggle(
-                'hidden',
-                state.isPlaying
-            );
+            el.iconPlay.classList.toggle('hidden', state.isPlaying);
         }
 
         if (el.iconPause) {
-            el.iconPause.classList.toggle(
-                'hidden',
-                !state.isPlaying
-            );
+            el.iconPause.classList.toggle('hidden', !state.isPlaying);
         }
 
         if (el.playerBox) {
-            el.playerBox.classList.toggle(
-                'playing',
-                state.isPlaying
-            );
+            el.playerBox.classList.toggle('playing', state.isPlaying);
         }
     }
 
@@ -285,30 +363,18 @@
         if (PLAYLIST.length <= 1) return 0;
 
         let lastIndex = -1;
-
         try {
-            const saved = sessionStorage.getItem(
-                'volts_last_login_track'
-            );
-
-            if (saved !== null) {
-                lastIndex = Number(saved);
-            }
+            const saved = sessionStorage.getItem('volts_last_login_track');
+            if (saved !== null) lastIndex = Number(saved);
         } catch (_) {}
 
-        let nextIdx = Math.floor(
-            Math.random() * PLAYLIST.length
-        );
-
+        let nextIdx = Math.floor(Math.random() * PLAYLIST.length);
         if (nextIdx === lastIndex) {
             nextIdx = (nextIdx + 1) % PLAYLIST.length;
         }
 
         try {
-            sessionStorage.setItem(
-                'volts_last_login_track',
-                String(nextIdx)
-            );
+            sessionStorage.setItem('volts_last_login_track', String(nextIdx));
         } catch (_) {}
 
         return nextIdx;
@@ -316,8 +382,8 @@
 
     function updateTrackDisplay() {
         const track = PLAYLIST[state.trackIndex] || {
-            title: 'Sem faixa',
-            artist: 'VOLTS RP',
+            title: 'Volts Radio',
+            artist: 'A cidade nunca para',
             src: '',
             cover: './capa.png'
         };
@@ -331,7 +397,7 @@
         }
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=24`;
+            el.musicCoverImg.src = `${track.cover}?v=25`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -340,28 +406,19 @@
 
     if (el.musicCoverImg) {
         el.musicCoverImg.addEventListener('error', () => {
-            const currentSrc =
-                el.musicCoverImg.getAttribute('src') || '';
-
+            const currentSrc = el.musicCoverImg.getAttribute('src') || '';
             if (!currentSrc.includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=24';
+                el.musicCoverImg.src = './capa.png?v=25';
             }
         });
     }
 
     function playAudioElement() {
-        if (
-            !el.bgMusic ||
-            !state.audioEnabled ||
-            !el.bgMusic.src
-        ) {
-            return;
-        }
+        if (!el.bgMusic || !state.audioEnabled || !el.bgMusic.src) return;
 
-        applyLowVolume();
+        syncVolumeUI();
 
         const req = el.bgMusic.play();
-
         if (req && typeof req.then === 'function') {
             req
                 .then(() => syncPlayerIcons(true))
@@ -372,15 +429,12 @@
     function loadTrack(index, autoplay = true) {
         if (!PLAYLIST.length || !el.bgMusic) return;
 
-        state.trackIndex = (
-            (index % PLAYLIST.length) + PLAYLIST.length
-        ) % PLAYLIST.length;
+        state.trackIndex = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
 
         const track = updateTrackDisplay();
-
         el.bgMusic.src = track.src;
 
-        applyLowVolume();
+        syncVolumeUI();
         el.bgMusic.load();
 
         if (!autoplay || !state.audioEnabled) {
@@ -406,27 +460,22 @@
 
         if (!el.bgMusic.paused && state.isPlaying) {
             state.audioEnabled = false;
-
             el.bgMusic.pause();
             syncPlayerIcons(false);
-
             emitToServer('volts:audio', '0');
         } else {
             state.audioEnabled = true;
-
             if (!el.bgMusic.src) {
                 loadTrack(state.trackIndex, true);
             } else {
                 playAudioElement();
             }
-
             emitToServer('volts:audio', '1');
         }
     }
 
     function stopMusicCleanly() {
         state.audioEnabled = false;
-
         syncPlayerIcons(false);
 
         if (el.bgMusic) {
@@ -451,27 +500,16 @@
             }
         });
 
-        el.bgMusic.addEventListener('pause', () => {
-            syncPlayerIcons(false);
-        });
-
+        el.bgMusic.addEventListener('pause', () => syncPlayerIcons(false));
         el.bgMusic.addEventListener('play', () => {
-            applyLowVolume();
+            syncVolumeUI();
             syncPlayerIcons(true);
         });
-
-        el.bgMusic.addEventListener('error', () => {
-            syncPlayerIcons(false);
-        });
+        el.bgMusic.addEventListener('error', () => syncPlayerIcons(false));
     }
 
     document.addEventListener('pointerdown', () => {
-        if (
-            state.audioEnabled &&
-            el.bgMusic &&
-            el.bgMusic.paused &&
-            el.bgMusic.src
-        ) {
+        if (state.audioEnabled && el.bgMusic && el.bgMusic.paused && el.bgMusic.src) {
             playAudioElement();
         }
     }, { passive: true });
@@ -497,6 +535,23 @@
         });
     }
 
+    if (el.volumeSlider) {
+        el.volumeSlider.addEventListener('input', (e) => {
+            setVolumeLevel(Number(e.target.value) / 100);
+        });
+    }
+
+    if (el.btnMuteToggle) {
+        el.btnMuteToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (state.volume > 0) {
+                setVolumeLevel(0);
+            } else {
+                setVolumeLevel(state.lastNonZeroVolume || DEFAULT_VOLUME);
+            }
+        });
+    }
+
     /* =========================================================
        MOSTRAR E OCULTAR SENHAS
        ========================================================= */
@@ -509,27 +564,16 @@
 
         btn.setAttribute('aria-pressed', String(visible));
 
-        if (openIcon) {
-            openIcon.classList.toggle('hidden', !visible);
-        }
-
-        if (closedIcon) {
-            closedIcon.classList.toggle('hidden', visible);
-        }
+        if (openIcon) openIcon.classList.toggle('hidden', !visible);
+        if (closedIcon) closedIcon.classList.toggle('hidden', visible);
     }
 
     function resetAllPasswordInputs() {
         document.querySelectorAll('.eye-btn').forEach((btn) => {
             const targetId = btn.getAttribute('data-target');
+            const input = targetId ? document.getElementById(targetId) : null;
 
-            const input = targetId
-                ? document.getElementById(targetId)
-                : null;
-
-            if (input) {
-                input.type = 'password';
-            }
-
+            if (input) input.type = 'password';
             setEyeButtonState(btn, false);
         });
     }
@@ -537,19 +581,13 @@
     document.querySelectorAll('.eye-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const targetId = btn.getAttribute('data-target');
-
-            const input = targetId
-                ? document.getElementById(targetId)
-                : null;
+            const input = targetId ? document.getElementById(targetId) : null;
 
             if (!input) return;
 
             const showText = input.type === 'password';
-
             input.type = showText ? 'text' : 'password';
-
             setEyeButtonState(btn, showText);
-
             input.focus();
         });
     });
@@ -567,25 +605,14 @@
 
     function setLoading(isLoading) {
         state.loading = isLoading;
-
         clearLoadingTimer();
 
-        [
-            el.btnSubmitLogin,
-            el.btnSubmitRegister
-        ].forEach((btn) => {
+        [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
             if (!btn) return;
-
             btn.disabled = isLoading;
 
             const spinner = btn.querySelector('.spinner');
-
-            if (spinner) {
-                spinner.classList.toggle(
-                    'hidden',
-                    !isLoading
-                );
-            }
+            if (spinner) spinner.classList.toggle('hidden', !isLoading);
         });
 
         if (isLoading) {
@@ -594,25 +621,17 @@
 
                 state.loading = false;
 
-                [
-                    el.btnSubmitLogin,
-                    el.btnSubmitRegister
-                ].forEach((btn) => {
+                [el.btnSubmitLogin, el.btnSubmitRegister].forEach((btn) => {
                     if (!btn) return;
-
                     btn.disabled = false;
 
-                    const spinner =
-                        btn.querySelector('.spinner');
-
-                    if (spinner) {
-                        spinner.classList.add('hidden');
-                    }
+                    const spinner = btn.querySelector('.spinner');
+                    if (spinner) spinner.classList.add('hidden');
                 });
 
                 showFeedback(
                     'warning',
-                    'Sem resposta do servidor. Verifique o console e tente novamente.'
+                    'Sem resposta do servidor. Verifique sua conexão e tente novamente.'
                 );
             }, REQUEST_TIMEOUT_MS);
         }
@@ -622,9 +641,7 @@
         if (!el.feedbackBox) return;
 
         el.feedbackBox.className = `feedback-box ${type}`;
-
         el.feedbackBox.textContent = message;
-
         el.feedbackBox.classList.remove('hidden');
     }
 
@@ -632,70 +649,44 @@
         if (!el.feedbackBox) return;
 
         el.feedbackBox.classList.add('hidden');
-
         el.feedbackBox.textContent = '';
     }
 
     /* =========================================================
-       ABAS DE LOGIN E REGISTRO
+       ABAS ENTRAR / CRIAR CONTA
        ========================================================= */
 
     function switchTab(tab) {
         if (state.loading) return;
 
         state.activeTab = tab;
-
         clearFeedback();
         resetAllPasswordInputs();
 
         const isLogin = tab === 'login';
 
         if (el.tabLogin) {
-            el.tabLogin.classList.toggle(
-                'active',
-                isLogin
-            );
-
-            el.tabLogin.setAttribute(
-                'aria-selected',
-                String(isLogin)
-            );
+            el.tabLogin.classList.toggle('active', isLogin);
+            el.tabLogin.setAttribute('aria-selected', String(isLogin));
         }
 
         if (el.tabRegister) {
-            el.tabRegister.classList.toggle(
-                'active',
-                !isLogin
-            );
-
-            el.tabRegister.setAttribute(
-                'aria-selected',
-                String(!isLogin)
-            );
+            el.tabRegister.classList.toggle('active', !isLogin);
+            el.tabRegister.setAttribute('aria-selected', String(!isLogin));
         }
 
         if (el.formLogin) {
-            el.formLogin.classList.toggle(
-                'hidden',
-                !isLogin
-            );
+            el.formLogin.classList.toggle('hidden', !isLogin);
         }
 
         if (el.formRegister) {
-            el.formRegister.classList.toggle(
-                'hidden',
-                isLogin
-            );
+            el.formRegister.classList.toggle('hidden', isLogin);
         }
 
         if (isLogin) {
-            if (el.loginPassword) {
-                el.loginPassword.focus();
-            }
+            if (el.loginPassword) el.loginPassword.focus();
         } else {
-            if (el.regPassword) {
-                el.regPassword.focus();
-            }
+            if (el.regPassword) el.regPassword.focus();
         }
     }
 
@@ -713,179 +704,97 @@
             el.regUsername.value = state.username;
         }
 
-        if (el.accountBadge) {
-            el.accountBadge.textContent = registered
-                ? `${state.username} • Conta registrada`
-                : `${state.username} • Sem cadastro`;
-        }
-
+        loadRememberedPassword(state.username);
         switchTab(registered ? 'login' : 'register');
     }
 
     if (el.tabLogin) {
-        el.tabLogin.addEventListener('click', () => {
-            switchTab('login');
-        });
+        el.tabLogin.addEventListener('click', () => switchTab('login'));
     }
 
     if (el.tabRegister) {
-        el.tabRegister.addEventListener('click', () => {
-            switchTab('register');
+        el.tabRegister.addEventListener('click', () => switchTab('register'));
+    }
+
+    if (el.btnForgotPass) {
+        el.btnForgotPass.addEventListener('click', () => {
+            showFeedback(
+                'warning',
+                'O sistema de recuperação de senha está temporariamente inativo.'
+            );
         });
     }
 
     /* =========================================================
-       LOGIN
+       ENVIO DE LOGIN E REGISTRO
        ========================================================= */
 
     if (el.formLogin) {
         el.formLogin.addEventListener('submit', (e) => {
             e.preventDefault();
-
             if (state.loading) return;
 
-            const password = el.loginPassword
-                ? el.loginPassword.value
-                : '';
+            const password = el.loginPassword ? el.loginPassword.value : '';
 
-            if (
-                !password ||
-                password.length < 1 ||
-                password.length > 32
-            ) {
-                showFeedback(
-                    'error',
-                    'Digite uma senha válida (até 32 caracteres).'
-                );
-
-                if (el.loginPassword) {
-                    el.loginPassword.focus();
-                }
-
+            if (!password || password.length < 1 || password.length > 32) {
+                showFeedback('error', 'Digite uma senha válida (até 32 caracteres).');
+                if (el.loginPassword) el.loginPassword.focus();
                 return;
             }
 
+            syncRememberedPassword(state.username, password);
             clearFeedback();
-
             setLoading(true);
 
             if (!emitToServer('volts:login', password)) {
                 setLoading(false);
-
-                showFeedback(
-                    'error',
-                    'Não foi possível conectar ao CEF.'
-                );
+                showFeedback('error', 'Não foi possível conectar ao CEF.');
             }
         });
     }
 
-    /* =========================================================
-       REGISTRO
-       ========================================================= */
-
     if (el.formRegister) {
         el.formRegister.addEventListener('submit', (e) => {
             e.preventDefault();
-
             if (state.loading) return;
 
-            const pass1 = el.regPassword
-                ? el.regPassword.value
-                : '';
+            const pass1 = el.regPassword ? el.regPassword.value : '';
+            const pass2 = el.regPasswordConfirm ? el.regPasswordConfirm.value : '';
 
-            const pass2 = el.regPasswordConfirm
-                ? el.regPasswordConfirm.value
-                : '';
-
-            if (
-                !pass1 ||
-                pass1.length < 6 ||
-                pass1.length > 32
-            ) {
-                showFeedback(
-                    'error',
-                    'A senha deve ter entre 6 e 32 caracteres.'
-                );
-
-                if (el.regPassword) {
-                    el.regPassword.focus();
-                }
-
+            if (!pass1 || pass1.length < 6 || pass1.length > 32) {
+                showFeedback('error', 'A senha deve ter entre 6 e 32 caracteres.');
+                if (el.regPassword) el.regPassword.focus();
                 return;
             }
 
             if (isWeakPassword(pass1)) {
                 showFeedback(
                     'error',
-                    'Senha muito fácil! Evite sequências como 123456 ou números repetidos.'
+                    'Senha muito fácil! Evite sequências como 123456 ou caracteres repetidos.'
                 );
-
-                if (el.regPassword) {
-                    el.regPassword.focus();
-                }
-
+                if (el.regPassword) el.regPassword.focus();
                 return;
             }
 
             if (pass1 !== pass2) {
-                showFeedback(
-                    'error',
-                    'As duas senhas digitadas não coincidem.'
-                );
-
-                if (el.regPasswordConfirm) {
-                    el.regPasswordConfirm.focus();
-                }
-
+                showFeedback('error', 'As duas senhas digitadas não coincidem.');
+                if (el.regPasswordConfirm) el.regPasswordConfirm.focus();
                 return;
             }
 
             if (pass1.includes('|')) {
-                showFeedback(
-                    'error',
-                    'O caractere "|" não é permitido na senha.'
-                );
-
+                showFeedback('error', 'O caractere "|" não é permitido na senha.');
                 return;
             }
 
             const payload = `${pass1}|${pass2}`;
 
-            console.log(
-                '[VOLTS REGISTRO] Preparando envio:',
-                {
-                    senha1Length: pass1.length,
-                    senha2Length: pass2.length,
-                    payloadLength: payload.length,
-                    cefDisponivel: typeof cef !== 'undefined',
-                    cefEmitDisponivel:
-                        typeof cef !== 'undefined' &&
-                        typeof cef.emit === 'function'
-                }
-            );
-
             clearFeedback();
-
             setLoading(true);
 
-            const enviado = emitToServer(
-                'volts:register',
-                payload
-            );
-
-            console.log(
-                '[VOLTS REGISTRO] Evento volts:register enviado:',
-                enviado
-            );
-
-            if (!enviado) {
+            if (!emitToServer('volts:register', payload)) {
                 setLoading(false);
-
-                showFeedback(
-                    'error',
-                    'Não foi possível conectar ao CEF.'
-                );
+                showFeedback('error', 'Não foi possível conectar ao CEF.');
             }
         });
     }
@@ -894,102 +803,67 @@
        INICIALIZAÇÃO
        ========================================================= */
 
-    updateClock();
+    updateClockAndDate();
+    setInterval(updateClockAndDate, 1000);
 
-    setInterval(updateClock, 1000);
-
-    setClockDotState(true);
-
-    applyLowVolume();
-
+    setServerOnlineState(true);
+    updatePlayersCounter(0, MAX_SERVER_SLOTS);
+    syncVolumeUI();
     resetAllPasswordInputs();
-
     initializeCityTips();
 
     window.addEventListener('load', () => {
         const startIndex = getRandomTrackIndex();
-
         loadTrack(startIndex, true);
-
         emitToServer('volts:ready', '1');
     });
 
     /* =========================================================
-       EVENTOS CEF
+       EVENTOS RECEBIDOS DO PAWN (CEF)
        ========================================================= */
 
-    if (
-        typeof cef !== 'undefined' &&
-        typeof cef.on === 'function'
-    ) {
-
+    if (typeof cef !== 'undefined' && typeof cef.on === 'function') {
         cef.on('volts:init', (username, isRegistered) => {
             setLoading(false);
-
-            applyServerInit(
-                username,
-                isRegistered
-            );
+            applyServerInit(username, isRegistered);
         });
 
         cef.on('volts:status', (statusValue) => {
-            const normalized = String(statusValue || '')
-                .trim()
-                .toLowerCase();
-
+            const normalized = String(statusValue || '').trim().toLowerCase();
             const isOffline =
                 normalized === '0' ||
                 normalized === 'offline' ||
                 normalized === 'false';
 
-            setClockDotState(!isOffline);
+            setServerOnlineState(!isOffline);
+        });
+
+        cef.on('volts:players', (onlineCount, maxSlots) => {
+            updatePlayersCounter(onlineCount, maxSlots);
         });
 
         cef.on('volts:feedback', (type, message) => {
-            const feedbackType =
-                String(type || 'error').toLowerCase();
+            const feedbackType = String(type || 'error').toLowerCase();
 
             showFeedback(
                 feedbackType,
                 message || 'Erro ao processar solicitação.'
             );
 
-            if (
-                feedbackType === 'error' ||
-                feedbackType === 'warning'
-            ) {
+            if (feedbackType === 'error' || feedbackType === 'warning') {
                 setLoading(false);
 
                 if (state.activeTab === 'register') {
-
-                    if (el.regPassword) {
-                        el.regPassword.value = '';
-                    }
-
-                    if (el.regPasswordConfirm) {
-                        el.regPasswordConfirm.value = '';
-                    }
-
+                    if (el.regPassword) el.regPassword.value = '';
+                    if (el.regPasswordConfirm) el.regPasswordConfirm.value = '';
                     resetAllPasswordInputs();
-
-                    if (el.regPassword) {
-                        el.regPassword.focus();
-                    }
-
+                    if (el.regPassword) el.regPassword.focus();
                 } else {
-
-                    if (el.loginPassword) {
-                        el.loginPassword.value = '';
-                    }
-
+                    if (el.loginPassword) el.loginPassword.value = '';
                     resetAllPasswordInputs();
-
-                    if (el.loginPassword) {
-                        el.loginPassword.focus();
-                    }
+                    if (el.loginPassword) el.loginPassword.focus();
                 }
             }
         });
     }
-
 })();
