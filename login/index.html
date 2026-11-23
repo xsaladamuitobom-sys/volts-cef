@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#090a0d">
+    <meta name="theme-color" content="#08090c">
     <title>VOLTS RP — Login</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css?v=25">
+    <link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
     <!-- CAMADA DE FUNDO -->
@@ -21,7 +21,7 @@
 
     <!-- TOPO ESQUERDO: RELÓGIO E DATA -->
     <header class="hud-top-left" aria-label="Horário e data">
-        <span class="accent-bar-red" aria-hidden="true"></span>
+        <span class="accent-bar-gold" aria-hidden="true"></span>
         <div class="clock-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="12" cy="12" r="9"/>
@@ -29,8 +29,8 @@
             </svg>
         </div>
         <div class="clock-texts">
-            <span id="liveClock" class="clock-time">12:00:18</span>
-            <span id="liveDate" class="clock-date">23 DE NOVEMBRO, 2026</span>
+            <span id="liveClock" class="clock-time">00:00:00</span>
+            <span id="liveDate" class="clock-date">CARREGANDO DATA...</span>
         </div>
     </header>
 
@@ -39,7 +39,7 @@
         <span id="serverStatusDot" class="status-dot" aria-hidden="true"></span>
         <div class="status-info">
             <span id="serverStatusText" class="status-title">SERVIDOR ONLINE</span>
-            <span id="playerCountText" class="status-players">JOGADORES: 1/50</span>
+            <span id="playerCountText" class="status-players">JOGADORES: 0/50</span>
         </div>
         <span class="accent-bar-muted" aria-hidden="true"></span>
     </aside>
@@ -50,7 +50,7 @@
 
         <div class="tips-header">
             <span class="tips-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 18h6"/>
                     <path d="M10 22h4"/>
                     <path d="M12 2a7 7 0 0 0-4 12.75c.65.45 1 1.15 1 1.95V17h6v-.3c0-.8.35-1.5 1-1.95A7 7 0 0 0 12 2z"/>
@@ -64,7 +64,7 @@
         </p>
 
         <div class="tips-footer">
-            <span id="cityTipCounter" class="tips-counter">01 / 05</span>
+            <span id="cityTipCounter" class="tips-counter">01 / 16</span>
 
             <div id="cityTipSegments" class="tips-segments" role="tablist" aria-label="Selecionar dica">
                 <button type="button" class="tip-seg active" data-index="0" aria-label="Dica 1"></button>
@@ -72,16 +72,27 @@
                 <button type="button" class="tip-seg" data-index="2" aria-label="Dica 3"></button>
                 <button type="button" class="tip-seg" data-index="3" aria-label="Dica 4"></button>
                 <button type="button" class="tip-seg" data-index="4" aria-label="Dica 5"></button>
+                <button type="button" class="tip-seg" data-index="5" aria-label="Dica 6"></button>
+                <button type="button" class="tip-seg" data-index="6" aria-label="Dica 7"></button>
+                <button type="button" class="tip-seg" data-index="7" aria-label="Dica 8"></button>
+                <button type="button" class="tip-seg" data-index="8" aria-label="Dica 9"></button>
+                <button type="button" class="tip-seg" data-index="9" aria-label="Dica 10"></button>
+                <button type="button" class="tip-seg" data-index="10" aria-label="Dica 11"></button>
+                <button type="button" class="tip-seg" data-index="11" aria-label="Dica 12"></button>
+                <button type="button" class="tip-seg" data-index="12" aria-label="Dica 13"></button>
+                <button type="button" class="tip-seg" data-index="13" aria-label="Dica 14"></button>
+                <button type="button" class="tip-seg" data-index="14" aria-label="Dica 15"></button>
+                <button type="button" class="tip-seg" data-index="15" aria-label="Dica 16"></button>
             </div>
 
             <div class="tips-arrows">
                 <button id="btnPrevTip" type="button" class="tip-arrow-btn" title="Dica anterior" aria-label="Dica anterior">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="15 18 9 12 15 6"/>
                     </svg>
                 </button>
                 <button id="btnNextTip" type="button" class="tip-arrow-btn" title="Próxima dica" aria-label="Próxima dica">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 18 15 12 9 6"/>
                     </svg>
                 </button>
@@ -104,7 +115,7 @@
             </button>
 
             <button id="tabRegister" type="button" class="tab-btn" role="tab" aria-selected="false">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="9"/>
                     <line x1="12" y1="8" x2="12" y2="16"/>
                     <line x1="8" y1="12" x2="16" y2="12"/>
@@ -121,7 +132,7 @@
             <form id="formLogin" class="auth-form" autocomplete="off">
                 <div class="field-row">
                     <span class="field-side-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
@@ -136,7 +147,7 @@
 
                 <div class="field-row">
                     <span class="field-side-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="11" width="16" height="10" rx="2"/>
                             <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
                             <circle cx="12" cy="16" r="1"/>
@@ -146,12 +157,12 @@
                         <label for="loginPassword" class="field-label">Senha</label>
                         <div class="input-box">
                             <input id="loginPassword" type="password" placeholder="Digite sua senha..." maxlength="32" required>
-                            <button type="button" class="eye-btn" data-target="loginPassword" aria-pressed="false" title="Mostrar ou ocultar senha">
-                                <svg class="icon-eye-open hidden" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <button type="button" class="eye-btn" data-target="loginPassword" aria-pressed="false" title="Mostrar ou ocultar senha" aria-label="Mostrar ou ocultar senha">
+                                <svg class="icon-eye-open hidden" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                     <circle cx="12" cy="12" r="3"/>
                                 </svg>
-                                <svg class="icon-eye-closed" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <svg class="icon-eye-closed" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
                                     <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
                                     <line x1="1" y1="1" x2="23" y2="23"/>
@@ -174,7 +185,7 @@
                 </div>
 
                 <button id="btnSubmitLogin" type="submit" class="submit-btn">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                         <polyline points="10 17 15 12 10 7"/>
                         <line x1="15" y1="12" x2="3" y2="12"/>
@@ -188,7 +199,7 @@
             <form id="formRegister" class="auth-form hidden" autocomplete="off">
                 <div class="field-row">
                     <span class="field-side-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
@@ -203,7 +214,7 @@
 
                 <div class="field-row">
                     <span class="field-side-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="11" width="16" height="10" rx="2"/>
                             <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
                             <circle cx="12" cy="16" r="1"/>
@@ -213,12 +224,12 @@
                         <label for="regPassword" class="field-label">Senha (6 a 32 caracteres)</label>
                         <div class="input-box">
                             <input id="regPassword" type="password" placeholder="Crie sua senha..." maxlength="32" required>
-                            <button type="button" class="eye-btn" data-target="regPassword" aria-pressed="false" title="Mostrar ou ocultar senha">
-                                <svg class="icon-eye-open hidden" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <button type="button" class="eye-btn" data-target="regPassword" aria-pressed="false" title="Mostrar ou ocultar senha" aria-label="Mostrar ou ocultar senha">
+                                <svg class="icon-eye-open hidden" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                     <circle cx="12" cy="12" r="3"/>
                                 </svg>
-                                <svg class="icon-eye-closed" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <svg class="icon-eye-closed" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
                                     <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
                                     <line x1="1" y1="1" x2="23" y2="23"/>
@@ -230,7 +241,7 @@
 
                 <div class="field-row">
                     <span class="field-side-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                             <polyline points="9 12 11 14 15 10"/>
                         </svg>
@@ -239,12 +250,12 @@
                         <label for="regPasswordConfirm" class="field-label">Confirmar Senha</label>
                         <div class="input-box">
                             <input id="regPasswordConfirm" type="password" placeholder="Repita sua senha..." maxlength="32" required>
-                            <button type="button" class="eye-btn" data-target="regPasswordConfirm" aria-pressed="false" title="Mostrar ou ocultar senha">
-                                <svg class="icon-eye-open hidden" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <button type="button" class="eye-btn" data-target="regPasswordConfirm" aria-pressed="false" title="Mostrar ou ocultar senha" aria-label="Mostrar ou ocultar senha">
+                                <svg class="icon-eye-open hidden" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                     <circle cx="12" cy="12" r="3"/>
                                 </svg>
-                                <svg class="icon-eye-closed" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <svg class="icon-eye-closed" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
                                     <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
                                     <line x1="1" y1="1" x2="23" y2="23"/>
@@ -255,7 +266,7 @@
                 </div>
 
                 <button id="btnSubmitRegister" type="submit" class="submit-btn">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                         <circle cx="8.5" cy="7" r="4"/>
                         <line x1="20" y1="8" x2="20" y2="14"/>
@@ -271,16 +282,16 @@
     <!-- RODAPÉ ESQUERDO: PLAYER VOLTS RADIO -->
     <section id="playerBox" class="radio-player" aria-label="Volts Radio">
         <div class="radio-cover-wrap">
-            <img id="musicCoverImg" src="./capa.png?v=25" alt="Capa Volts Radio" class="radio-cover-img">
+            <img id="musicCoverImg" src="./capa.png?v=26" alt="Capa Volts Radio" class="radio-cover-img">
         </div>
 
         <div class="radio-meta">
-            <span id="musicTrackTitle" class="radio-title">LET'S GO 5</span>
-            <span id="musicTrackArtist" class="radio-subtitle">MC IG</span>
+            <span id="musicTrackTitle" class="radio-title">Volts Radio</span>
+            <span id="musicTrackArtist" class="radio-subtitle">A cidade nunca para</span>
         </div>
 
         <div class="radio-controls">
-            <button id="btnPrevTrack" type="button" class="radio-btn" title="Anterior" aria-label="Anterior">
+            <button id="btnPrevTrack" type="button" class="radio-btn" title="Faixa anterior" aria-label="Faixa anterior">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                     <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
                 </svg>
@@ -295,7 +306,7 @@
                 </svg>
             </button>
 
-            <button id="btnNextTrack" type="button" class="radio-btn" title="Próxima" aria-label="Próxima">
+            <button id="btnNextTrack" type="button" class="radio-btn" title="Próxima faixa" aria-label="Próxima faixa">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                     <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
                 </svg>
@@ -303,7 +314,7 @@
         </div>
 
         <div class="radio-volume">
-            <button id="btnMuteToggle" type="button" class="radio-btn volume-icon-btn" title="Silenciar ou ativar som" aria-label="Volume">
+            <button id="btnMuteToggle" type="button" class="radio-btn volume-icon-btn" title="Silenciar ou ativar som" aria-label="Silenciar ou ativar som">
                 <svg id="iconVolOn" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                     <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
                 </svg>
@@ -323,11 +334,11 @@
             <span class="brand-sep">•</span>
             <span class="brand-sub">SUA HISTÓRIA COMEÇA AQUI</span>
         </p>
-        <span class="accent-bar-red" aria-hidden="true"></span>
+        <span class="accent-bar-gold" aria-hidden="true"></span>
     </footer>
 
     <audio id="bgMusic" preload="auto"></audio>
 
-    <script src="app.js?v=25"></script>
+    <script src="app.js?v=26"></script>
 </body>
 </html>
