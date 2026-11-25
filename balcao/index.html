@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volts RP - Balcao Administrativo Municipal</title>
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --bg-panel: #0c1322;
+      --bg-card: #10192d;
+      --bg-card-hover: #15213b;
+      --gold: #f5b82e;
+      --gold-soft: rgba(245, 184, 46, 0.14);
+      --gold-border: rgba(245, 184, 46, 0.45);
+      --text-main: #f3f6fc;
+      --text-muted: #98a6c2;
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --ok: #2ecc71;
+      --warn: #f39c12;
+      --err: #e74c3c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at top left, rgba(245, 184, 46, 0.08), transparent 45%),
+                  linear-gradient(135deg, #050810 0%, #09101f 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1240px;
+      height: 92vh;
+      max-height: 780px;
+      background: var(--bg-panel);
+      border: 1px solid var(--gold-border);
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 28px rgba(245, 184, 46, 0.08);
+      display: grid;
+      grid-template-columns: 255px 1fr;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: #080d18;
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px 14px;
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+    }
+
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--gold-soft);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.4px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    .nav-btn.active {
+      background: var(--gold-soft);
+      border-color: var(--gold-border);
+      color: var(--gold);
+    }
+
+    .side-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      margin-right: 6px;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 66px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(8, 13, 24, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-left h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .topbar-left span {
+      font-size: 12px;
+      color: var(--gold);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .citizen-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .citizen-chip strong {
+      color: var(--gold);
+    }
+
+    .btn-close {
+      background: rgba(231, 76, 60, 0.14);
+      border: 1px solid rgba(231, 76, 60, 0.45);
+      color: #ff8b7e;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-close:hover {
+      background: rgba(231, 76, 60, 0.25);
+    }
+
+    .content {
+      flex: 1;
+      padding: 22px 24px;
+      overflow-y: auto;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-banner {
+      background: linear-gradient(120deg, rgba(245, 184, 46, 0.16), rgba(16, 25, 45, 0.92));
+      border: 1px solid var(--gold-border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-banner h2 {
+      font-size: 18px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .hero-banner p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .stat-val {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .stat-val.gold {
+      color: var(--gold);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.18s ease;
+    }
+
+    .service-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--gold-border);
+    }
+
+    .service-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .service-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .price-pill {
+      background: var(--gold-soft);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .service-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .service-req {
+      font-size: 11px;
+      color: #c8d3ea;
+    }
+
+    .service-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #080d18;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-gold:hover {
+      filter: brightness(1.06);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 14px;
+    }
+
+    .panel-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .list-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px;
+    }
+
+    .list-item:last-child {
+      border-bottom: none;
+    }
+
+    .proto-code {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 12, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-panel);
+      border: 1px solid var(--gold-border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-box h3 {
+      color: var(--gold);
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .form-group.visible {
+      display: block;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-main);
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: var(--text-main);
+      font-size: 13px;
+    }
+
+    .summary-box {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .summary-box strong {
+      color: var(--gold);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      max-width: 420px;
+      background: var(--bg-panel);
+      border: 1px solid var(--gold-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+      display: none;
+      z-index: 80;
+    }
+
+    .toast.open {
+      display: block;
+    }
+
+    .toast.success { border-color: rgba(46, 204, 113, 0.6); }
+    .toast.error { border-color: rgba(231, 76, 60, 0.6); }
+    .toast.warning { border-color: rgba(243, 156, 18, 0.6); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-badge">V</div>
+          <div>
+            <div class="brand-title">VOLTS RP</div>
+            <div class="brand-sub">Prefeitura Municipal</div>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-btn active" data-tab="inicio">Inicio</button>
+          <button class="nav-btn" data-tab="todos">Todos os servicos</button>
+          <button class="nav-btn" data-tab="documentos">Documentos &amp; Identidade</button>
+          <button class="nav-btn" data-tab="veiculos">Veiculos &amp; Transito</button>
+          <button class="nav-btn" data-tab="empresas">Empresas &amp; Licencas</button>
+          <button class="nav-btn" data-tab="multas">Multas &amp; Pendencias</button>
+          <button class="nav-btn" data-tab="protocolos">Meus protocolos</button>
+          <button class="nav-btn" data-tab="historico">Historico</button>
+          <button class="nav-btn" data-tab="informacoes">Informacoes</button>
+        </nav>
+      </div>
+
+      <div class="side-footer">
+        <div><span class="status-dot"></span>Atendimento Online</div>
+        <div style="margin-top: 4px;">Balcao Administrativo • 08h as 22h</div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 id="pageTitle">Inicio</h1>
+          <span>Balcao Administrativo • Volts RP</span>
+        </div>
+
+        <div class="topbar-right">
+          <div class="citizen-chip">
+            <strong id="topNome">Cidadao</strong> • ID <strong id="topId">#0</strong><br />
+            Banco: <strong id="topBanco">R$ 0</strong>
+          </div>
+          <button class="btn-close" id="btnFechar">Fechar</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="section active" id="sec-inicio">
+          <div class="hero-banner">
+            <div>
+              <h2>Bem-vindo ao Balcao Administrativo!</h2>
+              <p>Emita documentos, regularize pendencias, gerencie licencas e acompanhe seus protocolos com cobranca direta no banco.</p>
+            </div>
+            <button class="btn-gold" data-jump="todos">Ver servicos</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Saldo Bancario</div>
+              <div class="stat-val gold" id="statBanco">R$ 0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Situacao do RG</div>
+              <div class="stat-val" id="statRG">Nao emitido</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Multas Pendentes</div>
+              <div class="stat-val" id="statMultas">R$ 0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Alvara MEI / Autonomo</div>
+              <div class="stat-val" id="statAlvara">Inativo</div>
+            </div>
+          </div>
+
+          <div class="section-title">Servicos Populares</div>
+          <div class="services-grid" id="gridPopulares"></div>
+
+          <div class="two-col">
+            <div class="panel-box">
+              <div class="section-title">Ultimos Protocolos</div>
+              <div id="homeProtocolos">
+                <div class="list-item">Nenhum protocolo registrado ainda.</div>
+              </div>
+            </div>
+            <div class="panel-box">
+              <div class="section-title">Avisos Municipais</div>
+              <div class="list-item">Todas as taxas e servicos sao debitados diretamente do saldo bancario.</div>
+              <div class="list-item">A Certidao Negativa exige zero multas pendentes em seu nome.</div>
+              <div class="list-item">O Alvará Autonomo / MEI tem validade de 7 dias reais.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-todos">
+          <div class="section-title">Todos os Servicos Municipais</div>
+          <div class="services-grid" id="gridTodos"></div>
+        </section>
+
+        <section class="section" id="sec-documentos">
+          <div class="section-title">Documentos &amp; Identidade</div>
+          <div class="services-grid" id="gridDocumentos"></div>
+        </section>
+
+        <section class="section" id="sec-veiculos">
+          <div class="section-title">Veiculos &amp; Transito</div>
+          <div class="services-grid" id="gridVeiculos"></div>
+        </section>
+
+        <section class="section" id="sec-empresas">
+          <div class="section-title">Empresas &amp; Licencas</div>
+          <div class="services-grid" id="gridEmpresas"></div>
+        </section>
+
+        <section class="section" id="sec-multas">
+          <div class="section-title">Multas &amp; Pendencias</div>
+          <div class="services-grid" id="gridMultas"></div>
+        </section>
+
+        <section class="section" id="sec-protocolos">
+          <div class="section-title">Meus Protocolos</div>
+          <div class="panel-box" id="listaProtocolos">
+            <div class="list-item">Nenhum protocolo encontrado.</div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-historico">
+          <div class="section-title">Historico de Atendimentos</div>
+          <div class="panel-box" id="listaHistorico">
+            <div class="list-item">Nenhum registro no historico.</div>
+          </div>
+        </section>
+
+        <section class="section" id="sec-informacoes">
+          <div class="section-title">Informacoes do Balcao Administrativo</div>
+          <div class="panel-box">
+            <div class="list-item"><strong>Funcao:</strong> Despachante e atendimento burocratico municipal da Prefeitura de Volts RP.</div>
+            <div class="list-item"><strong>Cobranca:</strong> Realizada exclusivamente no banco do jogador apos confirmacao. Nao ha cobranca quando o requisito nao e atendido.</div>
+            <div class="list-item"><strong>Protocolos:</strong> Cada solicitacao concluida gera numero de protocolo unico e fica salva no banco de dados.</div>
+            <div class="list-item"><strong>Empregos e Carreira:</strong> Para assinar contrato ou pedir promocao, utilize a recepcao de empregos na Prefeitura.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalConfirm">
+    <div class="modal-box">
+      <h3 id="modalTitle">Confirmar Servico</h3>
+      <p class="modal-desc" id="modalDesc"></p>
+
+      <div class="form-group" id="groupParam1">
+        <label id="labelParam1" for="inputParam1">Informacao</label>
+        <input type="text" id="inputParam1" maxlength="48" placeholder="Digite aqui..." />
+      </div>
+
+      <div class="summary-box" id="modalSummary"></div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" id="btnCancelModal">Cancelar</button>
+        <button class="btn-gold" id="btnConfirmModal">Confirmar e Pagar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toastBox"></div>
+
+  <script>
+    const state = {
+      name: "Cidadao",
+      id: 0,
+      bank: 0,
+      hasRg: 0,
+      fines: 0,
+      hasAlvara: 0,
+      protocols: []
+    };
+
+    const SERVICES = [
+      { code: "rg_1via", cat: "documentos", popular: true, name: "Emissao de RG - 1a via", priceLabel: "R$ 150", amount: 150, desc: "Emissao inicial da carteira de identidade civil do cidadao.", req: "Requisito: Nao possuir RG emitido.", needInput: false },
+      { code: "rg_2via", cat: "documentos", popular: false, name: "Emissao de RG - 2a via", priceLabel: "R$ 300", amount: 300, desc: "Segunda via da identidade em caso de perda ou extravio.", req: "Requisito: Possuir RG ja emitido.", needInput: false },
+      { code: "cert_residencia", cat: "documentos", popular: false, name: "Certidao de residencia", priceLabel: "R$ 200", amount: 200, desc: "Comprovante oficial de residencia municipal.", req: "Requisito: Conta ativa no servidor.", needInput: false },
+      { code: "cert_nada_consta", cat: "documentos", popular: true, name: "Certidao negativa / Nada Consta", priceLabel: "R$ 250", amount: 250, desc: "Atesta ausencia de multas municipais pendentes.", req: "Requisito: Nao possuir multas pendentes.", needInput: false },
+      { code: "alteracao_nome", cat: "documentos", popular: true, name: "Alteracao de nome / registro civil", priceLabel: "R$ 2.500", amount: 2500, desc: "Registra solicitacao de alteracao de nome civil mantendo historico.", req: "Requisito: Informar novo nome (3 a 24 caracteres).", needInput: true, label: "Novo nome civil desejado", placeholder: "Ex: Lucas Andrade" },
+      { code: "reg_cadastral", cat: "documentos", popular: false, name: "Regularizacao cadastral", priceLabel: "R$ 350", amount: 350, desc: "Atualizacao e conferencia dos dados cadastrais municipais.", req: "Requisito: Conta ativa.", needInput: false },
+      { code: "procuracao", cat: "documentos", popular: false, name: "Registro de procuracao", priceLabel: "R$ 500", amount: 500, desc: "Formaliza procuracao administrativa para representacao.", req: "Requisito: Informar outorgado ou finalidade.", needInput: true, label: "Outorgado ou finalidade", placeholder: "Ex: Representacao patrimonial" },
+
+      { code: "quitar_multas", cat: "veiculos", popular: true, name: "Quitacao de multas", priceLabel: "Multas + 10%", amount: null, desc: "Quita debitos de multas pendentes acrescidos de 10% de taxa administrativa.", req: "Requisito: Possuir multas pendentes.", needInput: false },
+      { code: "reg_veiculo", cat: "veiculos", popular: true, name: "Regularizacao de veiculo / IPVA / licenciamento", priceLabel: "R$ 400", amount: 400, desc: "Regulariza documentacao e licenciamento veicular.", req: "Requisito: Informar placa ou modelo do veiculo.", needInput: true, label: "Placa ou identificacao do veiculo", placeholder: "Ex: VLT-1024" },
+      { code: "transf_veiculo", cat: "veiculos", popular: false, name: "Transferencia de veiculo", priceLabel: "R$ 600", amount: 600, desc: "Registra processo de transferencia de propriedade veicular.", req: "Requisito: Informar comprador ou destino.", needInput: true, label: "Nome ou ID do comprador", placeholder: "Ex: Carlos Silva" },
+      { code: "cert_propriedade", cat: "veiculos", popular: false, name: "Certidao de propriedade", priceLabel: "R$ 300", amount: 300, desc: "Emite certidao de propriedade vinculada ao veiculo.", req: "Requisito: Informar veiculo.", needInput: true, label: "Placa ou modelo do veiculo", placeholder: "Ex: VLT-1024" },
+      { code: "hist_veicular", cat: "veiculos", popular: false, name: "Historico veicular", priceLabel: "R$ 350", amount: 350, desc: "Consulta e emite historico administrativo do veiculo.", req: "Requisito: Informar veiculo.", needInput: true, label: "Placa ou modelo do veiculo", placeholder: "Ex: VLT-1024" },
+
+      { code: "alvara_mei", cat: "empresas", popular: true, name: "Alvara autonomo / MEI", priceLabel: "R$ 500 (7d)", amount: 500, desc: "Emite alvara de atividade autonoma com validade de 7 dias reais.", req: "Requisito: Saldo bancario de R$ 500.", needInput: false },
+      { code: "reg_empresa", cat: "empresas", popular: false, name: "Registro de empresa", priceLabel: "R$ 1.500", amount: 1500, desc: "Protocola abertura e registro de nova empresa municipal.", req: "Requisito: Informar nome da empresa.", needInput: true, label: "Nome da empresa", placeholder: "Ex: Oficina Central Volts" },
+      { code: "alvara_comercial", cat: "empresas", popular: false, name: "Alvara comercial", priceLabel: "R$ 1.000", amount: 1000, desc: "Emite alvara de funcionamento comercial.", req: "Requisito: Informar estabelecimento.", needInput: true, label: "Nome do estabelecimento", placeholder: "Ex: Conveniencia Sul" },
+      { code: "renovar_alvara", cat: "empresas", popular: false, name: "Renovacao de alvara", priceLabel: "R$ 500", amount: 500, desc: "Renova a validade do alvara por mais 7 dias reais.", req: "Requisito: Saldo bancario de R$ 500.", needInput: false },
+      { code: "licenca_evento", cat: "empresas", popular: false, name: "Licenca para evento", priceLabel: "R$ 750", amount: 750, desc: "Autorizacao municipal para realizacao de evento.", req: "Requisito: Informar nome ou local do evento.", needInput: true, label: "Nome ou local do evento", placeholder: "Ex: Encontro Automotivo" },
+
+      { code: "consulta_pendencias", cat: "multas", popular: false, name: "Consulta de pendencias", priceLabel: "R$ 100", amount: 100, desc: "Emite consulta oficial de debitos e situacao cadastral.", req: "Requisito: Saldo bancario de R$ 100.", needInput: false },
+      { code: "parcelar_debitos", cat: "multas", popular: false, name: "Parcelamento de debitos", priceLabel: "Entrada 10%", amount: null, desc: "Registra entrada de 10% sobre os debitos pendentes.", req: "Requisito: Possuir multas pendentes.", needInput: false },
+      { code: "limpeza_ficha", cat: "multas", popular: true, name: "Limpeza de ficha administrativa", priceLabel: "R$ 1.200", amount: 1200, desc: "Remove infracoes administrativas leves ja resolvidas. Nao apaga multas pendentes.", req: "Requisito: Sem multas pendentes.", needInput: false }
+    ];
+
+    let pendingService = null;
+
+    function formatBRL(val) {
+      return "R$ " + Number(val || 0).toLocaleString("pt-BR");
+    }
+
+    function showToast(type, msg, proto) {
+      const box = document.getElementById("toastBox");
+      box.className = "toast open " + (type || "success");
+      box.innerHTML = "<strong>" + (msg || "") + "</strong>" + (proto ? "<div style='margin-top:4px;color:#f5b82e'>Protocolo: " + proto + "</div>" : "");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => box.classList.remove("open"), 4500);
+    }
+
+    function emitCef(eventName, payload) {
+      if (window.cef && typeof window.cef.emit === "function") {
+        window.cef.emit(eventName, String(payload || ""));
+      }
+    }
+
+    function renderServiceCard(srv) {
+      const card = document.createElement("div");
+      card.className = "service-card";
+      card.innerHTML = `
+        <div>
+          <div class="service-top">
+            <div class="service-name">${srv.name}</div>
+            <span class="price-pill">${srv.priceLabel}</span>
+          </div>
+          <div class="service-desc" style="margin-top:6px">${srv.desc}</div>
+          <div class="service-req" style="margin-top:6px">${srv.req}</div>
+        </div>
+        <div class="service-actions">
+          <button class="btn-gold">Solicitar</button>
+        </div>
+      `;
+      card.querySelector("button").addEventListener("click", () => openServiceModal(srv));
+      return card;
+    }
+
+    function renderAllServices() {
+      const grids = {
+        populares: document.getElementById("gridPopulares"),
+        todos: document.getElementById("gridTodos"),
+        documentos: document.getElementById("gridDocumentos"),
+        veiculos: document.getElementById("gridVeiculos"),
+        empresas: document.getElementById("gridEmpresas"),
+        multas: document.getElementById("gridMultas")
+      };
+
+      Object.values(grids).forEach((g) => { if (g) g.innerHTML = ""; });
+
+      SERVICES.forEach((srv) => {
+        if (srv.popular && grids.populares) grids.populares.appendChild(renderServiceCard(srv));
+        if (grids.todos) grids.todos.appendChild(renderServiceCard(srv));
+        if (grids[srv.cat]) grids[srv.cat].appendChild(renderServiceCard(srv));
+      });
+    }
+
+    function estimateAmount(srv) {
+      if (typeof srv.amount === "number") return srv.amount;
+      if (srv.code === "quitar_multas") {
+        if (state.fines <= 0) return 0;
+        return state.fines + Math.ceil(state.fines * 0.10);
+      }
+      if (srv.code === "parcelar_debitos") {
+        if (state.fines <= 0) return 0;
+        return Math.max(1, Math.ceil(state.fines * 0.10));
+      }
+      return 0;
+    }
+
+    function openServiceModal(srv) {
+      pendingService = srv;
+      document.getElementById("modalTitle").textContent = srv.name;
+      document.getElementById("modalDesc").textContent = srv.desc;
+
+      const group = document.getElementById("groupParam1");
+      const input = document.getElementById("inputParam1");
+      if (srv.needInput) {
+        group.classList.add("visible");
+        document.getElementById("labelParam1").textContent = srv.label || "Informacao";
+        input.placeholder = srv.placeholder || "";
+        input.value = "";
+      } else {
+        group.classList.remove("visible");
+        input.value = "";
+      }
+
+      const est = estimateAmount(srv);
+      document.getElementById("modalSummary").innerHTML = `
+        <div><strong>Valor estimado:</strong> ${formatBRL(est)}</div>
+        <div><strong>Saldo em conta:</strong> ${formatBRL(state.bank)}</div>
+        <div><strong>Cobranca:</strong> Direto no banco apos validacao do servidor</div>
+      `;
+
+      document.getElementById("modalConfirm").classList.add("open");
+    }
+
+    function closeServiceModal() {
+      pendingService = null;
+      document.getElementById("modalConfirm").classList.remove("open");
+    }
+
+    function renderPlayerState() {
+      document.getElementById("topNome").textContent = state.name;
+      document.getElementById("topId").textContent = "#" + state.id;
+      document.getElementById("topBanco").textContent = formatBRL(state.bank);
+
+      document.getElementById("statBanco").textContent = formatBRL(state.bank);
+      document.getElementById("statRG").textContent = state.hasRg ? "Emitido" : "Nao emitido";
+      document.getElementById("statMultas").textContent = formatBRL(state.fines);
+      document.getElementById("statAlvara").textContent = state.hasAlvara ? "Ativo (7d)" : "Inativo";
+    }
+
+    function renderProtocols() {
+      const homeEl = document.getElementById("homeProtocolos");
+      const fullEl = document.getElementById("listaProtocolos");
+      const histEl = document.getElementById("listaHistorico");
+
+      if (!state.protocols.length) {
+        homeEl.innerHTML = '<div class="list-item">Nenhum protocolo registrado ainda.</div>';
+        fullEl.innerHTML = '<div class="list-item">Nenhum protocolo encontrado.</div>';
+        histEl.innerHTML = '<div class="list-item">Nenhum registro no historico.</div>';
+        return;
+      }
+
+      homeEl.innerHTML = state.protocols.slice(0, 4).map((p) => `
+        <div class="list-item">
+          <span class="proto-code">${p.code}</span> • ${p.name} — <strong>${formatBRL(p.amount)}</strong> (${p.status})
+        </div>
+      `).join("");
+
+      const allHtml = state.protocols.map((p) => `
+        <div class="list-item">
+          <div><span class="proto-code">${p.code}</span> • <strong>${p.name}</strong> • ${p.status}</div>
+          <div style="color:#98a6c2;margin-top:3px">${p.date} • Valor: ${formatBRL(p.amount)} ${p.details ? "• " + p.details : ""}</div>
+        </div>
+      `).join("");
+
+      fullEl.innerHTML = allHtml;
+      histEl.innerHTML = allHtml;
+    }
+
+    function switchTab(tabName) {
+      const titles = {
+        inicio: "Inicio",
+        todos: "Todos os servicos",
+        documentos: "Documentos & Identidade",
+        veiculos: "Veiculos & Transito",
+        empresas: "Empresas & Licencas",
+        multas: "Multas & Pendencias",
+        protocolos: "Meus protocolos",
+        historico: "Historico",
+        informacoes: "Informacoes"
+      };
+
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tabName));
+      document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"));
+      const target = document.getElementById("sec-" + tabName);
+      if (target) target.classList.add("active");
+      document.getElementById("pageTitle").textContent = titles[tabName] || "Balcao Administrativo";
+    }
+
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
+
+    document.querySelectorAll("[data-jump]").forEach((btn) => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.jump));
+    });
+
+    document.getElementById("btnCancelModal").addEventListener("click", closeServiceModal);
+    document.getElementById("btnConfirmModal").addEventListener("click", () => {
+      if (!pendingService) return;
+      const p1 = document.getElementById("inputParam1").value.trim();
+      const payload = p1 ? `${pendingService.code}|${p1}` : pendingService.code;
+      emitCef("volts:balcao_request", payload);
+      closeServiceModal();
+    });
+
+    document.getElementById("btnFechar").addEventListener("click", () => {
+      emitCef("volts:balcao_close", "1");
+    });
+
+    if (window.cef && typeof window.cef.on === "function") {
+      window.cef.on("volts:balcao_player", (raw) => {
+        const parts = String(raw || "").split("|");
+        state.name = parts[0] || "Cidadao";
+        state.id = parseInt(parts[1] || "0", 10) || 0;
+        state.bank = parseInt(parts[2] || "0", 10) || 0;
+        state.hasRg = parseInt(parts[3] || "0", 10) || 0;
+        state.fines = parseInt(parts[4] || "0", 10) || 0;
+        state.hasAlvara = parseInt(parts[5] || "0", 10) || 0;
+        renderPlayerState();
+      });
+
+      window.cef.on("volts:balcao_protocols_clear", () => {
+        state.protocols = [];
+        renderProtocols();
+      });
+
+      window.cef.on("volts:balcao_protocol_item", (raw) => {
+        const parts = String(raw || "").split("|");
+        state.protocols.push({
+          code: parts[0] || "",
+          name: parts[1] || "",
+          amount: parseInt(parts[2] || "0", 10) || 0,
+          status: parts[3] || "Concluido",
+          date: parts[4] || "",
+          details: parts[5] || ""
+        });
+        renderProtocols();
+      });
+
+      window.cef.on("volts:balcao_feedback", (tipo, mensagem, protocolo) => {
+        showToast(tipo, mensagem, protocolo);
+      });
+    }
+
+    renderAllServices();
+    renderPlayerState();
+    renderProtocols();
+    emitCef("volts:balcao_ready", "1");
+  </script>
+</body>
+</html>
+```[cite: 2]
+
+Assim que você testar ou revisar esse `index.html`, me diga o que quer ajustar nele ou qual será o próximo arquivo/etapa do sistema.
