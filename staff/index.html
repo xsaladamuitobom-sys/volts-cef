@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volts RP - Painel Staff</title>
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --bg-panel: #0c1322;
+      --bg-card: #111b30;
+      --gold: #f5b82e;
+      --gold-soft: rgba(245, 184, 46, 0.14);
+      --gold-border: rgba(245, 184, 46, 0.45);
+      --text: #f3f6fc;
+      --muted: #98a6c2;
+      --border: rgba(148, 163, 184, 0.16);
+      --danger: #e74c3c;
+      --ok: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: rgba(5, 8, 16, 0.72);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 1080px;
+      height: 88vh;
+      max-height: 720px;
+      background: var(--bg-panel);
+      border: 1px solid var(--gold-border);
+      border-radius: 14px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: #080d18;
+      border-right: 1px solid var(--border);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .logo {
+      padding-bottom: 14px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo h2 { font-size: 16px; color: var(--gold); }
+    .logo span { font-size: 11px; color: var(--muted); }
+
+    .tabs { display: flex; flex-direction: column; gap: 5px; }
+
+    .tab-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab-btn:hover { background: var(--bg-card); color: var(--text); }
+    .tab-btn.active { background: var(--gold-soft); border-color: var(--gold-border); color: var(--gold); }
+
+    .hint { font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 10px; }
+
+    .main { display: flex; flex-direction: column; overflow: hidden; }
+
+    .header {
+      height: 58px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(8, 13, 24, 0.6);
+    }
+
+    .header h1 { font-size: 16px; color: var(--gold); }
+
+    .btn-close {
+      background: rgba(231, 76, 60, 0.16);
+      border: 1px solid rgba(231, 76, 60, 0.5);
+      color: #ff9488;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .body { flex: 1; padding: 18px 20px; overflow-y: auto; }
+    .sec { display: none; }
+    .sec.active { display: block; }
+
+    .row-form {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .field input, .field select {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+    }
+
+    .grid-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-title { font-size: 13px; font-weight: 700; }
+    .card-sub { font-size: 11px; color: var(--muted); }
+
+    .btn {
+      border: none;
+      border-radius: 7px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-gold { background: var(--gold); color: #080d18; }
+    .btn-danger { background: rgba(231, 76, 60, 0.22); border: 1px solid rgba(231, 76, 60, 0.55); color: #ff9488; }
+
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      background: var(--bg-panel);
+      border: 1px solid var(--gold-border);
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-size: 12px;
+      display: none;
+      z-index: 99;
+    }
+    .toast.open { display: block; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <aside class="sidebar">
+      <div>
+        <div class="logo">
+          <h2>VOLTS STAFF</h2>
+          <span>Acesso Nivel 10+</span>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="jogadores">Jogadores</button>
+          <button class="tab-btn" data-tab="tp">Teleportes (Cidades)</button>
+          <button class="tab-btn" data-tab="servidor">Servidor &amp; Veiculos</button>
+        </div>
+      </div>
+      <div class="hint">Atalho: <strong>INSERT</strong> abre/fecha</div>
+    </aside>
+
+    <div class="main">
+      <header class="header">
+        <h1 id="secTitle">Controle de Jogadores</h1>
+        <button class="btn-close" id="btnClose">Fechar</button>
+      </header>
+
+      <div class="body">
+        <section class="sec active" id="sec-jogadores">
+          <div class="row-form">
+            <div class="field">
+              <label>ID do Jogador Alvo</label>
+              <input type="number" id="targetId" placeholder="Ex: 0" min="0" />
+            </div>
+            <div class="field">
+              <label>Valor / Quantia / Skin / Cargo</label>
+              <input type="text" id="targetVal" placeholder="Ex: 5000 ou 23" />
+            </div>
+            <div class="field">
+              <label>Motivo (Kick / Ban)</label>
+              <input type="text" id="targetReason" placeholder="Ex: Conduta inadequada" />
+            </div>
+          </div>
+
+          <div class="grid-actions">
+            <div class="card">
+              <div><div class="card-title">Ir ate o Jogador (GOTO)</div><div class="card-sub">Teleporta voce ate o ID alvo</div></div>
+              <button class="btn btn-gold" onclick="sendPlayerAct('goto')">Executar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Puxar Jogador (BRING)</div><div class="card-sub">Puxa o ID alvo ate voce</div></div>
+              <button class="btn btn-gold" onclick="sendPlayerAct('bring')">Executar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Congelar / Descongelar</div><div class="card-sub">Trava ou libera movimentacao</div></div>
+              <button class="btn btn-gold" onclick="sendPlayerAct('freeze')">Alternar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Curar Jogador</div><div class="card-sub">Restaura vida para 100</div></div>
+              <button class="btn btn-gold" onclick="sendPlayerAct('heal')">Curar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Dar Dinheiro (Banco)</div><div class="card-sub">Usa o campo Valor/Quantia</div></div>
+              <button class="btn btn-gold" onclick="sendPlayerAct('givebank')">Enviar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Setar Skin</div><div class="card-sub">Aplica o ID da skin do campo Valor</div></div>
+              <button class="btn btn-gold" onclick="sendPlayerAct('setskin')">Aplicar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Setar Nivel</div><div class="card-sub">Atualiza nivel da conta (campo Valor)</div></div>
+              <button class="btn btn-gold" onclick="sendPlayerAct('setlevel')">Aplicar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Kickar Jogador</div><div class="card-sub">Desconecta com motivo</div></div>
+              <button class="btn btn-danger" onclick="sendPlayerAct('kick')">Kick</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Banir Jogador</div><div class="card-sub">Bane conta no banco com motivo</div></div>
+              <button class="btn btn-danger" onclick="sendPlayerAct('ban')">Ban</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="sec" id="sec-tp">
+          <div class="grid-actions" id="tpList"></div>
+          <div class="row-form">
+            <div class="field"><label>Coord X</label><input type="number" step="0.01" id="tpX" placeholder="1481.00" /></div>
+            <div class="field"><label>Coord Y</label><input type="number" step="0.01" id="tpY" placeholder="-1771.00" /></div>
+            <div class="field"><label>Coord Z</label><input type="number" step="0.01" id="tpZ" placeholder="18.80" /></div>
+          </div>
+          <button class="btn btn-gold" onclick="sendCustomTp()">Teleportar para Coordenadas</button>
+        </section>
+
+        <section class="sec" id="sec-servidor">
+          <div class="row-form">
+            <div class="field"><label>Anuncio Global / Spawn Veiculo ID</label><input type="text" id="srvInput" placeholder="Ex: 411 ou Mensagem" /></div>
+            <div class="field"><label>Clima (Weather ID)</label><input type="number" id="srvWeather" placeholder="Ex: 1" /></div>
+            <div class="field"><label>Hora (0 a 23)</label><input type="number" id="srvHour" min="0" max="23" placeholder="Ex: 12" /></div>
+          </div>
+          <div class="grid-actions">
+            <div class="card">
+              <div><div class="card-title">Anuncio Global</div><div class="card-sub">Envia aviso dourado no chat geral</div></div>
+              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'announce|' + val('srvInput'))">Anunciar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Spawnar Veiculo</div><div class="card-sub">Cria veiculo pelo modelo no campo</div></div>
+              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'veh|' + val('srvInput'))">Spawnar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Reparar Veiculo</div><div class="card-sub">Repara lataria e motor atual</div></div>
+              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'fixveh|1')">Reparar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Aplicar Clima</div><div class="card-sub">Altera clima global do servidor</div></div>
+              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'weather|' + val('srvWeather'))">Aplicar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Aplicar Hora</div><div class="card-sub">Altera hora mundial (0-23)</div></div>
+              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'time|' + val('srvHour'))">Aplicar</button>
+            </div>
+            <div class="card">
+              <div><div class="card-title">Limpar Chat Geral</div><div class="card-sub">Limpa linhas do chat para todos</div></div>
+              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'clearchat|1')">Limpar</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const TPS = [
+      { id: "ls_pref", city: "Los Santos", name: "Prefeitura", desc: "Pershing Square" },
+      { id: "ls_lspd", city: "Los Santos", name: "Delegacia LSPD", desc: "Commerce / Centro" },
+      { id: "ls_hosp", city: "Los Santos", name: "Hospital Central", desc: "All Saints" },
+      { id: "ls_lixo", city: "Los Santos", name: "Deposito Coletor", desc: "Willowfield" },
+      { id: "sf_centro", city: "San Fierro", name: "Centro de SF", desc: "Downtown San Fierro" },
+      { id: "sf_aero", city: "San Fierro", name: "Aeroporto Easter Bay", desc: "Pista / Terminal SF" },
+      { id: "lv_strip", city: "Las Venturas", name: "The Strip", desc: "Cassinos LV" },
+      { id: "lv_aero", city: "Las Venturas", name: "Aeroporto LV", desc: "Las Venturas Airport" }
+    ];
+
+    function val(id) {
+      const el = document.getElementById(id);
+      return el ? String(el.value || "").trim().replace(/\|/g, " ") : "";
+    }
+
+    function emitCef(ev, payload) {
+      if (window.cef && typeof window.cef.emit === "function") {
+        window.cef.emit(ev, String(payload || ""));
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("open");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => t.classList.remove("open"), 3500);
+    }
+
+    function sendPlayerAct(action) {
+      emitCef("volts:staff_player", `${action}|${val("targetId")}|${val("targetVal")}|${val("targetReason")}`);
+    }
+
+    function sendCustomTp() {
+      emitCef("volts:staff_tp", `custom|${val("tpX")}|${val("tpY")}|${val("tpZ")}`);
+    }
+
+    const tpContainer = document.getElementById("tpList");
+    TPS.forEach((tp) => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <div><div class="card-title">${tp.name}</div><div class="card-sub">${tp.city} • ${tp.desc}</div></div>
+        <button class="btn btn-gold">Teleportar</button>
+      `;
+      div.querySelector("button").addEventListener("click", () => emitCef("volts:staff_tp", tp.id));
+      tpContainer.appendChild(div);
+    });
+
+    const titles = {
+      jogadores: "Controle de Jogadores",
+      tp: "Teleportes por Cidade",
+      servidor: "Servidor & Veiculos"
+    };
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b === btn));
+        document.querySelectorAll(".sec").forEach((s) => s.classList.toggle("active", s.id === "sec-" + tab));
+        document.getElementById("secTitle").textContent = titles[tab] || "Painel Staff";
+      });
+    });
+
+    document.getElementById("btnClose").addEventListener("click", () => emitCef("volts:staff_close", "1"));
+
+    if (window.cef && typeof window.cef.on === "function") {
+      window.cef.on("volts:staff_feedback", (_tipo, msg) => showToast(msg));
+    }
+
+    emitCef("volts:staff_ready", "1");
+  </script>
+</body>
+</html>
