@@ -3,7 +3,7 @@
     const REQUEST_TIMEOUT_MS = 12000;
     const TIP_INTERVAL_MS = 9000;
     const MAX_SERVER_SLOTS = 50;
-    const ASSET_VERSION = '33';
+    const ASSET_VERSION = '34';
 
     const MONTHS_PT = [
         'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL',
@@ -79,11 +79,11 @@
         currentTipIndex: 0,
         tipTimer: null,
         readyEmitted: false,
-        bgVideoBound: false
+        bgImageBound: false
     };
 
     const el = {
-        bgVideo: document.getElementById('bgVideo'),
+        bgImage: document.getElementById('bgImage'),
 
         liveClock: document.getElementById('liveClock'),
         liveDate: document.getElementById('liveDate'),
@@ -135,45 +135,32 @@
     };
 
     /* =========================================================
-       VÍDEO DE FUNDO (WEBM AUTOPLAY MUTADO + LIMPEZA SEGURA)
+       IMAGEM DE FUNDO (PNG + FALLBACK SEGURO)
        ========================================================= */
 
-    function tryPlayBackgroundVideo() {
-        if (!el.bgVideo) return;
+    function initBackgroundImage() {
+        if (!el.bgImage) return;
 
-        el.bgVideo.defaultMuted = true;
-        el.bgVideo.muted = true;
-        el.bgVideo.loop = true;
-        el.bgVideo.playsInline = true;
+        if (!state.bgImageBound) {
+            state.bgImageBound = true;
+            el.bgImage.addEventListener('error', () => {
+                const currentSrc = el.bgImage.getAttribute('src') || '';
+                if (!currentSrc.includes('./capa.png')) {
+                    el.bgImage.src = `./capa.png?v=${ASSET_VERSION}`;
+                }
+            }, { once: true });
+        }
 
-        if (!el.bgVideo.paused) return;
-
-        const playPromise = el.bgVideo.play();
-        if (playPromise && typeof playPromise.catch === 'function') {
-            playPromise.catch(() => {});
+        if (!el.bgImage.getAttribute('src')) {
+            el.bgImage.src = `./fundo.png?v=${ASSET_VERSION}`;
         }
     }
 
-    function startBackgroundVideo() {
-        if (!el.bgVideo) return;
-
-        if (!state.bgVideoBound) {
-            state.bgVideoBound = true;
-            el.bgVideo.addEventListener('loadeddata', tryPlayBackgroundVideo, { once: true });
-            el.bgVideo.addEventListener('canplay', tryPlayBackgroundVideo, { once: true });
-        }
-
-        tryPlayBackgroundVideo();
-    }
-
-    function stopBackgroundVideo() {
-        if (!el.bgVideo) return;
+    function clearBackgroundImage() {
+        if (!el.bgImage) return;
 
         try {
-            el.bgVideo.pause();
-            el.bgVideo.removeAttribute('src');
-            el.bgVideo.querySelectorAll('source').forEach((s) => s.remove());
-            el.bgVideo.load();
+            el.bgImage.removeAttribute('src');
         } catch (_) {}
     }
 
@@ -540,7 +527,7 @@
     }
 
     function cleanupOnUnload() {
-        stopBackgroundVideo();
+        clearBackgroundImage();
         state.audioEnabled = false;
         syncPlayerIcons(false);
 
@@ -575,9 +562,6 @@
     }
 
     document.addEventListener('pointerdown', () => {
-        if (el.bgVideo && el.bgVideo.paused) {
-            tryPlayBackgroundVideo();
-        }
         if (state.audioEnabled && el.bgMusic && el.bgMusic.paused && el.bgMusic.src) {
             playAudioElement();
         }
@@ -869,7 +853,7 @@
     }
 
     /* =========================================================
-       INICIALIZAÇÃO (SEM TRAVAR NO DOWNLOAD DO VÍDEO)
+       INICIALIZAÇÃO (SEM TRAVAR NO DOWNLOAD DO FUNDO)
        ========================================================= */
 
     function bootstrapUI() {
@@ -882,7 +866,7 @@
         resetAllPasswordInputs();
         initializeCityTips();
 
-        startBackgroundVideo();
+        initBackgroundImage();
 
         const startIndex = getRandomTrackIndex();
         loadTrack(startIndex, true);
@@ -945,3 +929,4 @@
         });
     }
 })();
+```[cite: 5]
