@@ -63,7 +63,6 @@ body {
     object-position: center center;
     opacity: 1;
     display: block;
-    filter: brightness(0.45) contrast(1.06) saturate(0.92);
 }
 
 .bg-dim {
@@ -1142,6 +1141,3 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
-```[cite: 4]
-
-Salve como `style.css` na mesma pasta do `index.html` e do `app.js` do login[cite: 4, 5]. Se você voltar a notar aquele congelamento/demora no CEF, basta tirar o `filter` da `.bg-image` e deixar só o `background` da `.bg-dim`[cite: 4].
