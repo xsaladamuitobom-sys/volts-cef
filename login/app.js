@@ -3,6 +3,7 @@
     const REQUEST_TIMEOUT_MS = 12000;
     const TIP_INTERVAL_MS = 9000;
     const MAX_SERVER_SLOTS = 50;
+    const ASSET_VERSION = '33';
 
     const MONTHS_PT = [
         'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL',
@@ -77,7 +78,8 @@
         loadingTimer: null,
         currentTipIndex: 0,
         tipTimer: null,
-        readyEmitted: false
+        readyEmitted: false,
+        bgVideoBound: false
     };
 
     const el = {
@@ -133,19 +135,35 @@
     };
 
     /* =========================================================
-       VÍDEO DE FUNDO (AUTOPLAY MUTADO + LIMPEZA SEGURA)
+       VÍDEO DE FUNDO (WEBM AUTOPLAY MUTADO + LIMPEZA SEGURA)
        ========================================================= */
 
-    function startBackgroundVideo() {
+    function tryPlayBackgroundVideo() {
         if (!el.bgVideo) return;
 
+        el.bgVideo.defaultMuted = true;
         el.bgVideo.muted = true;
         el.bgVideo.loop = true;
+        el.bgVideo.playsInline = true;
+
+        if (!el.bgVideo.paused) return;
 
         const playPromise = el.bgVideo.play();
         if (playPromise && typeof playPromise.catch === 'function') {
             playPromise.catch(() => {});
         }
+    }
+
+    function startBackgroundVideo() {
+        if (!el.bgVideo) return;
+
+        if (!state.bgVideoBound) {
+            state.bgVideoBound = true;
+            el.bgVideo.addEventListener('loadeddata', tryPlayBackgroundVideo, { once: true });
+            el.bgVideo.addEventListener('canplay', tryPlayBackgroundVideo, { once: true });
+        }
+
+        tryPlayBackgroundVideo();
     }
 
     function stopBackgroundVideo() {
@@ -444,7 +462,7 @@
         }
 
         if (el.musicCoverImg && track.cover) {
-            el.musicCoverImg.src = `${track.cover}?v=31`;
+            el.musicCoverImg.src = `${track.cover}?v=${ASSET_VERSION}`;
             el.musicCoverImg.alt = `Capa de ${track.title}`;
         }
 
@@ -455,7 +473,7 @@
         el.musicCoverImg.addEventListener('error', () => {
             const currentSrc = el.musicCoverImg.getAttribute('src') || '';
             if (!currentSrc.includes('./capa.png')) {
-                el.musicCoverImg.src = './capa.png?v=31';
+                el.musicCoverImg.src = `./capa.png?v=${ASSET_VERSION}`;
             }
         });
     }
@@ -558,7 +576,7 @@
 
     document.addEventListener('pointerdown', () => {
         if (el.bgVideo && el.bgVideo.paused) {
-            startBackgroundVideo();
+            tryPlayBackgroundVideo();
         }
         if (state.audioEnabled && el.bgMusic && el.bgMusic.paused && el.bgMusic.src) {
             playAudioElement();
