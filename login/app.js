@@ -3,7 +3,7 @@
     const REQUEST_TIMEOUT_MS = 12000;
     const TIP_INTERVAL_MS = 9000;
     const MAX_SERVER_SLOTS = 50;
-    const ASSET_VERSION = '34';
+    const ASSET_VERSION = '35';
 
     const MONTHS_PT = [
         'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL',
@@ -929,4 +929,3 @@
         });
     }
 })();
-```[cite: 5]
