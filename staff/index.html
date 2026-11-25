@@ -3,329 +3,802 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Volts RP - Painel Staff</title>
+  <title>Volts RolePlay - Painel Mestre Staff</title>
   <style>
     :root {
-      --bg-dark: #070b14;
-      --bg-panel: #0c1322;
-      --bg-card: #111b30;
-      --gold: #f5b82e;
-      --gold-soft: rgba(245, 184, 46, 0.14);
-      --gold-border: rgba(245, 184, 46, 0.45);
-      --text: #f3f6fc;
-      --muted: #98a6c2;
+      --bg-dark: #060911;
+      --bg-panel: #0b111e;
+      --bg-card: #10192c;
+      --bg-card-hover: #16223b;
+      --gold: #f6bd2a;
+      --gold-bright: #ffd559;
+      --gold-soft: rgba(246, 189, 42, 0.14);
+      --gold-border: rgba(246, 189, 42, 0.45);
+      --text: #f4f7fc;
+      --muted: #95a4c2;
       --border: rgba(148, 163, 184, 0.16);
-      --danger: #e74c3c;
-      --ok: #2ecc71;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --amber: #f59e0b;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
 
     body {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: rgba(5, 8, 16, 0.72);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(246, 189, 42, 0.12), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.08), transparent 45%),
+        rgba(4, 7, 13, 0.82);
       color: var(--text);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 18px;
+      gap: 10px;
+      padding: 16px;
     }
 
-    .panel {
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(6, 9, 17, 0.5); }
+    ::-webkit-scrollbar-thumb { background: rgba(246, 189, 42, 0.3); border-radius: 999px; }
+
+    .master-frame {
       width: 100%;
-      max-width: 1080px;
-      height: 88vh;
-      max-height: 720px;
+      max-width: 1320px;
+      height: 86vh;
+      max-height: 780px;
       background: var(--bg-panel);
       border: 1px solid var(--gold-border);
-      border-radius: 14px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      border-radius: 16px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.88), 0 0 32px rgba(246, 189, 42, 0.1);
       display: grid;
-      grid-template-columns: 220px 1fr;
+      grid-template-columns: 235px 1fr;
       overflow: hidden;
     }
 
+    /* SIDEBAR ESQUERDA */
     .sidebar {
-      background: #080d18;
+      background: #070b14;
       border-right: 1px solid var(--border);
       padding: 16px 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      overflow-y: auto;
     }
 
-    .logo {
-      padding-bottom: 14px;
-      margin-bottom: 12px;
+    .brand-box {
+      text-align: center;
+      padding: 8px 8px 14px;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
     }
 
-    .logo h2 { font-size: 16px; color: var(--gold); }
-    .logo span { font-size: 11px; color: var(--muted); }
+    .brand-crown {
+      font-size: 20px;
+      color: var(--gold);
+      line-height: 1;
+    }
 
-    .tabs { display: flex; flex-direction: column; gap: 5px; }
+    .brand-name {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--gold);
+      text-shadow: 0 2px 14px rgba(246, 189, 42, 0.35);
+    }
 
-    .tab-btn {
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text);
+      opacity: 0.85;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
       width: 100%;
       text-align: left;
       background: transparent;
       border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 9px 11px;
       color: var(--muted);
-      padding: 10px 12px;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 600;
       cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
     }
 
-    .tab-btn:hover { background: var(--bg-card); color: var(--text); }
-    .tab-btn.active { background: var(--gold-soft); border-color: var(--gold-border); color: var(--gold); }
+    .nav-item:hover {
+      background: var(--bg-card);
+      color: var(--text);
+    }
 
-    .hint { font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 10px; }
+    .nav-item.active {
+      background: var(--gold-soft);
+      border-color: var(--gold-border);
+      color: var(--gold);
+    }
 
-    .main { display: flex; flex-direction: column; overflow: hidden; }
+    .nav-title { font-size: 13px; font-weight: 700; }
+    .nav-desc { font-size: 10px; opacity: 0.78; }
 
-    .header {
-      height: 58px;
-      padding: 0 20px;
+    .sidebar-slogan {
+      text-align: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: var(--gold);
+      font-style: italic;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* AREA PRINCIPAL */
+    .main-area {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* TOPBAR COM PERFIL E METRICAS */
+    .top-profile {
+      padding: 12px 18px;
+      background: rgba(7, 11, 20, 0.78);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(8, 13, 24, 0.6);
+      gap: 14px;
+      flex-wrap: wrap;
     }
 
-    .header h1 { font-size: 16px; color: var(--gold); }
-
-    .btn-close {
-      background: rgba(231, 76, 60, 0.16);
-      border: 1px solid rgba(231, 76, 60, 0.5);
-      color: #ff9488;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .body { flex: 1; padding: 18px 20px; overflow-y: auto; }
-    .sec { display: none; }
-    .sec.active { display: block; }
+    .avatar-ring {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      border: 2px solid var(--gold);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--gold);
+    }
 
-    .row-form {
+    .avatar-crown {
+      position: absolute;
+      top: -12px;
+      font-size: 13px;
+      color: var(--gold-bright);
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid var(--bg-panel);
+    }
+
+    .profile-info h2 { font-size: 16px; font-weight: 700; }
+    .profile-info h2 span { color: var(--gold); }
+    .profile-info p { font-size: 11px; color: var(--muted); }
+    .profile-info strong { color: var(--gold); }
+
+    .metrics-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .metric-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 13px;
+      min-width: 126px;
+    }
+
+    .metric-label { font-size: 10px; color: var(--muted); }
+    .metric-value { font-size: 14px; font-weight: 800; color: var(--text); margin-top: 2px; }
+    .metric-value.gold { color: var(--gold); }
+
+    /* CORPO DIVIDIDO: CENTRO + COLUNA DIREITA */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 275px;
+      overflow: hidden;
+    }
+
+    .center-scroll {
+      padding: 16px 18px;
+      overflow-y: auto;
+    }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .pane-head {
+      margin-bottom: 14px;
+    }
+
+    .pane-head h3 { font-size: 17px; font-weight: 800; color: var(--gold); }
+    .pane-head p { font-size: 12px; color: var(--muted); }
+
+    .input-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 14px;
       background: var(--bg-card);
       border: 1px solid var(--border);
+      border-radius: 12px;
       padding: 12px;
-      border-radius: 10px;
+      margin-bottom: 14px;
     }
 
-    .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
     .field input, .field select {
       width: 100%;
       background: var(--bg-dark);
       border: 1px solid var(--border);
-      color: var(--text);
+      border-radius: 8px;
       padding: 8px 10px;
-      border-radius: 7px;
+      color: var(--text);
       font-size: 12px;
+      outline: none;
     }
 
-    .grid-actions {
+    .field input:focus { border-color: var(--gold-border); }
+
+    .cards-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 11px;
+      margin-bottom: 14px;
     }
 
-    .card {
+    .fn-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
+      padding: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s ease;
+    }
+
+    .fn-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--gold-border);
+    }
+
+    .fn-title { font-size: 13px; font-weight: 700; color: var(--text); }
+    .fn-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .arrow-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--gold-border);
+      background: var(--gold-soft);
+      color: var(--gold);
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .arrow-btn:hover {
+      background: var(--gold);
+      color: #070b14;
+    }
+
+    .arrow-btn.danger {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+    }
+
+    .arrow-btn.danger:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .log-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       padding: 12px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      font-size: 12px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .log-entry:last-child { border-bottom: none; }
+    .log-entry strong { color: var(--gold); }
+
+    /* COLUNA DIREITA */
+    .right-rail {
+      background: rgba(7, 11, 20, 0.65);
+      border-left: 1px solid var(--border);
+      padding: 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
+      overflow-y: auto;
     }
 
-    .card-title { font-size: 13px; font-weight: 700; }
-    .card-sub { font-size: 11px; color: var(--muted); }
+    .rail-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
 
-    .btn {
-      border: none;
-      border-radius: 7px;
-      padding: 7px 11px;
-      font-size: 12px;
+    .rail-title {
+      font-size: 13px;
       font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .staff-member {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 6px 0;
+    }
+
+    .badge-master {
+      background: var(--gold-soft);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .info-line {
+      font-size: 11px;
+      color: var(--muted);
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    .info-line:last-child { border-bottom: none; }
+    .info-line strong { color: var(--text); }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .quick-btn {
+      border: none;
+      border-radius: 9px;
+      padding: 9px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
       cursor: pointer;
     }
 
-    .btn-gold { background: var(--gold); color: #080d18; }
-    .btn-danger { background: rgba(231, 76, 60, 0.22); border: 1px solid rgba(231, 76, 60, 0.55); color: #ff9488; }
+    .q-green { background: var(--green); }
+    .q-red { background: var(--red); }
+    .q-blue { background: var(--blue); }
+
+    /* RODAPE INFERIOR */
+    .footer-bar {
+      width: 100%;
+      max-width: 1320px;
+      background: rgba(7, 11, 20, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .key-badge {
+      background: var(--gold);
+      color: #070b14;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 11px;
+    }
 
     .toast {
       position: fixed;
-      bottom: 18px;
-      right: 18px;
+      bottom: 64px;
+      right: 24px;
       background: var(--bg-panel);
       border: 1px solid var(--gold-border);
-      padding: 10px 14px;
-      border-radius: 9px;
+      color: var(--text);
+      padding: 11px 15px;
+      border-radius: 10px;
       font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.75);
       display: none;
       z-index: 99;
     }
+
     .toast.open { display: block; }
   </style>
 </head>
 <body>
-  <div class="panel">
+  <div class="master-frame">
     <aside class="sidebar">
       <div>
-        <div class="logo">
-          <h2>VOLTS STAFF</h2>
-          <span>Acesso Nivel 10+</span>
+        <div class="brand-box">
+          <div class="brand-crown">👑</div>
+          <div class="brand-name">VOLTS</div>
+          <div class="brand-sub">ROLEPLAY</div>
         </div>
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="jogadores">Jogadores</button>
-          <button class="tab-btn" data-tab="tp">Teleportes (Cidades)</button>
-          <button class="tab-btn" data-tab="servidor">Servidor &amp; Veiculos</button>
-        </div>
+
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tab="mestre">
+            <span class="nav-title">Painel Mestre</span>
+            <span class="nav-desc">Funcoes administrativas</span>
+          </button>
+          <button class="nav-item" data-tab="jogadores">
+            <span class="nav-title">Jogadores</span>
+            <span class="nav-desc">Gerencie os jogadores</span>
+          </button>
+          <button class="nav-item" data-tab="tp">
+            <span class="nav-title">Teleportes</span>
+            <span class="nav-desc">Todas as cidades e locais</span>
+          </button>
+          <button class="nav-item" data-tab="economia">
+            <span class="nav-title">Economia &amp; VIP</span>
+            <span class="nav-desc">Dinheiro, nivel e cargos</span>
+          </button>
+          <button class="nav-item" data-tab="logs">
+            <span class="nav-title">Logs &amp; Historico</span>
+            <span class="nav-desc">Acoes registradas</span>
+          </button>
+          <button class="nav-item" data-tab="config">
+            <span class="nav-title">Configuracoes</span>
+            <span class="nav-desc">Clima, hora e anuncios</span>
+          </button>
+          <button class="nav-item" id="btnSairMenu">
+            <span class="nav-title">Sair do Painel</span>
+            <span class="nav-desc">Fechar painel (INSERT)</span>
+          </button>
+        </nav>
       </div>
-      <div class="hint">Atalho: <strong>INSERT</strong> abre/fecha</div>
+
+      <div class="sidebar-slogan">
+        Volts RolePlay<br />Sua nova historia comeca aqui!
+      </div>
     </aside>
 
-    <div class="main">
-      <header class="header">
-        <h1 id="secTitle">Controle de Jogadores</h1>
-        <button class="btn-close" id="btnClose">Fechar</button>
+    <div class="main-area">
+      <header class="top-profile">
+        <div class="profile-left">
+          <div class="avatar-ring">
+            <span class="avatar-crown">👑</span>
+            <span id="staffInitial">B</span>
+            <span class="status-dot"></span>
+          </div>
+          <div class="profile-info">
+            <h2>Ola, <span id="staffName">Bruno Wolf</span>!</h2>
+            <p>Cargo: <strong>Mestre do Servidor 👑</strong> • Nivel <strong id="staffLevel">10+</strong></p>
+            <p>Sessao ativa: <strong id="staffSession">Online</strong></p>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-pill">
+            <div class="metric-label">Jogadores Online</div>
+            <div class="metric-value" id="statOnline">1 / 50</div>
+          </div>
+          <div class="metric-pill">
+            <div class="metric-label">Tempo Online</div>
+            <div class="metric-value" id="statUptime">00:00:00</div>
+          </div>
+          <div class="metric-pill">
+            <div class="metric-label">Seu Banco</div>
+            <div class="metric-value gold" id="statCash">R$ 0</div>
+          </div>
+        </div>
       </header>
 
-      <div class="body">
-        <section class="sec active" id="sec-jogadores">
-          <div class="row-form">
-            <div class="field">
-              <label>ID do Jogador Alvo</label>
-              <input type="number" id="targetId" placeholder="Ex: 0" min="0" />
+      <div class="workspace">
+        <main class="center-scroll">
+          <!-- ABA 1: PAINEL MESTRE -->
+          <section class="tab-pane active" id="pane-mestre">
+            <div class="pane-head">
+              <h3>Funcoes Administrativas</h3>
+              <p>Acesso total do Painel Mestre para gerenciar jogadores, cidades, economia e servidor.</p>
             </div>
-            <div class="field">
-              <label>Valor / Quantia / Skin / Cargo</label>
-              <input type="text" id="targetVal" placeholder="Ex: 5000 ou 23" />
+
+            <div class="cards-grid">
+              <div class="fn-card">
+                <div><div class="fn-title">Administrar Jogador</div><div class="fn-sub">Kick, ban, freeze, curar e skin</div></div>
+                <button class="arrow-btn" data-go="jogadores">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Anuncios</div><div class="fn-sub">Envie avisos globais no chat</div></div>
+                <button class="arrow-btn" data-go="config">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Veiculos</div><div class="fn-sub">Spawn e reparo de veiculos</div></div>
+                <button class="arrow-btn" data-go="config">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Teleportes</div><div class="fn-sub">LS, SF, LV e coordenadas</div></div>
+                <button class="arrow-btn" data-go="tp">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Economia</div><div class="fn-sub">Enviar dinheiro e ajustar nivel</div></div>
+                <button class="arrow-btn" data-go="economia">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Logs &amp; Historico</div><div class="fn-sub">Acompanhe acoes executadas</div></div>
+                <button class="arrow-btn" data-go="logs">→</button>
+              </div>
             </div>
-            <div class="field">
-              <label>Motivo (Kick / Ban)</label>
-              <input type="text" id="targetReason" placeholder="Ex: Conduta inadequada" />
+          </section>
+
+          <!-- ABA 2: JOGADORES -->
+          <section class="tab-pane" id="pane-jogadores">
+            <div class="pane-head">
+              <h3>Controle de Jogadores</h3>
+              <p>Informe o ID do jogador alvo, valor/skin/nivel e motivo quando necessario.</p>
+            </div>
+
+            <div class="input-bar">
+              <div class="field">
+                <label>ID do Jogador</label>
+                <input type="number" id="pId" min="0" placeholder="Ex: 0" />
+              </div>
+              <div class="field">
+                <label>Valor / Skin / Nivel</label>
+                <input type="text" id="pVal" placeholder="Ex: 23 ou 10000" />
+              </div>
+              <div class="field">
+                <label>Motivo (Kick / Ban)</label>
+                <input type="text" id="pReason" placeholder="Ex: Quebra de regras" />
+              </div>
+            </div>
+
+            <div class="cards-grid">
+              <div class="fn-card">
+                <div><div class="fn-title">Ir ate o Jogador</div><div class="fn-sub">Teleporta voce ate o alvo</div></div>
+                <button class="arrow-btn" onclick="playerAction('goto')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Puxar Jogador</div><div class="fn-sub">Puxa o alvo ate sua posicao</div></div>
+                <button class="arrow-btn" onclick="playerAction('bring')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Congelar / Liberar</div><div class="fn-sub">Trava ou solta o jogador</div></div>
+                <button class="arrow-btn" onclick="playerAction('freeze')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Curar Jogador</div><div class="fn-sub">Restaura vida para 100</div></div>
+                <button class="arrow-btn" onclick="playerAction('heal')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Setar Skin</div><div class="fn-sub">Aplica skin do campo Valor</div></div>
+                <button class="arrow-btn" onclick="playerAction('setskin')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Dar Dinheiro (Banco)</div><div class="fn-sub">Credita valor no banco</div></div>
+                <button class="arrow-btn" onclick="playerAction('givebank')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Setar Nivel</div><div class="fn-sub">Define nivel da conta</div></div>
+                <button class="arrow-btn" onclick="playerAction('setlevel')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Kickar Jogador</div><div class="fn-sub">Expulsa com motivo</div></div>
+                <button class="arrow-btn danger" onclick="playerAction('kick')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Banir Jogador</div><div class="fn-sub">Bloqueia conta no banco</div></div>
+                <button class="arrow-btn danger" onclick="playerAction('ban')">→</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ABA 3: TELEPORTES -->
+          <section class="tab-pane" id="pane-tp">
+            <div class="pane-head">
+              <h3>Teleportes — Todas as Cidades</h3>
+              <p>Locais rapidos em Los Santos, San Fierro, Las Venturas e coordenadas livres.</p>
+            </div>
+
+            <div class="cards-grid" id="tpCards"></div>
+
+            <div class="input-bar">
+              <div class="field"><label>Coord X</label><input type="number" step="0.01" id="tpX" placeholder="1481.00" /></div>
+              <div class="field"><label>Coord Y</label><input type="number" step="0.01" id="tpY" placeholder="-1771.00" /></div>
+              <div class="field"><label>Coord Z</label><input type="number" step="0.01" id="tpZ" placeholder="18.80" /></div>
+            </div>
+            <button class="arrow-btn" style="width:auto;padding:8px 16px" onclick="customTp()">Teleportar para Coordenadas →</button>
+          </section>
+
+          <!-- ABA 4: ECONOMIA -->
+          <section class="tab-pane" id="pane-economia">
+            <div class="pane-head">
+              <h3>Economia e Progressao</h3>
+              <p>Ajuste rapido de saldo bancario e nivel de jogadores.</p>
+            </div>
+            <div class="input-bar">
+              <div class="field"><label>ID do Jogador</label><input type="number" id="ecoId" min="0" placeholder="Ex: 0" /></div>
+              <div class="field"><label>Quantia / Novo Nivel</label><input type="number" id="ecoVal" placeholder="Ex: 5000" /></div>
+              <div class="field"><label>Observacao</label><input type="text" id="ecoObs" placeholder="Ex: Premio evento" /></div>
+            </div>
+            <div class="cards-grid">
+              <div class="fn-card">
+                <div><div class="fn-title">Depositar no Banco</div><div class="fn-sub">Envia valor para o ID</div></div>
+                <button class="arrow-btn" onclick="ecoAction('givebank')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Alterar Nivel</div><div class="fn-sub">Define nivel do ID</div></div>
+                <button class="arrow-btn" onclick="ecoAction('setlevel')">→</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ABA 5: LOGS -->
+          <section class="tab-pane" id="pane-logs">
+            <div class="pane-head">
+              <h3>Logs da Sessao</h3>
+              <p>Registro das acoes executadas durante esta sessao do painel.</p>
+            </div>
+            <div class="log-box" id="logList">
+              <div class="log-entry">Nenhuma acao executada ainda nesta sessao.</div>
+            </div>
+          </section>
+
+          <!-- ABA 6: CONFIGURACOES -->
+          <section class="tab-pane" id="pane-config">
+            <div class="pane-head">
+              <h3>Configuracoes, Veiculos e Anuncios</h3>
+              <p>Controles globais do mundo, veiculos e comunicacao com o servidor.</p>
+            </div>
+            <div class="input-bar">
+              <div class="field"><label>Anuncio / Modelo Veiculo</label><input type="text" id="cfgMain" placeholder="Ex: 411 ou Evento as 20h" /></div>
+              <div class="field"><label>Clima (Weather ID)</label><input type="number" id="cfgWeather" placeholder="Ex: 1" /></div>
+              <div class="field"><label>Hora (0 a 23)</label><input type="number" id="cfgHour" min="0" max="23" placeholder="Ex: 18" /></div>
+            </div>
+            <div class="cards-grid">
+              <div class="fn-card">
+                <div><div class="fn-title">Anuncio Global</div><div class="fn-sub">Envia mensagem para todos</div></div>
+                <button class="arrow-btn" onclick="cmdAction('announce', valOf('cfgMain'))">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Spawnar Veiculo</div><div class="fn-sub">Cria veiculo pelo ID</div></div>
+                <button class="arrow-btn" onclick="cmdAction('veh', valOf('cfgMain'))">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Reparar Veiculo</div><div class="fn-sub">Conserta veiculo atual</div></div>
+                <button class="arrow-btn" onclick="cmdAction('fixveh', '1')">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Definir Clima</div><div class="fn-sub">Altera clima global</div></div>
+                <button class="arrow-btn" onclick="cmdAction('weather', valOf('cfgWeather'))">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Definir Hora</div><div class="fn-sub">Altera horario (0-23)</div></div>
+                <button class="arrow-btn" onclick="cmdAction('time', valOf('cfgHour'))">→</button>
+              </div>
+              <div class="fn-card">
+                <div><div class="fn-title">Limpar Chat</div><div class="fn-sub">Limpa chat de todos</div></div>
+                <button class="arrow-btn" onclick="cmdAction('clearchat', '1')">→</button>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <aside class="right-rail">
+          <div class="rail-card">
+            <div class="rail-title"><span>Staff Online</span><span id="staffCountBadge">1</span></div>
+            <div class="staff-member">
+              <span id="railStaffName">Bruno Wolf</span>
+              <span class="badge-master">Mestre</span>
             </div>
           </div>
 
-          <div class="grid-actions">
-            <div class="card">
-              <div><div class="card-title">Ir ate o Jogador (GOTO)</div><div class="card-sub">Teleporta voce ate o ID alvo</div></div>
-              <button class="btn btn-gold" onclick="sendPlayerAct('goto')">Executar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Puxar Jogador (BRING)</div><div class="card-sub">Puxa o ID alvo ate voce</div></div>
-              <button class="btn btn-gold" onclick="sendPlayerAct('bring')">Executar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Congelar / Descongelar</div><div class="card-sub">Trava ou libera movimentacao</div></div>
-              <button class="btn btn-gold" onclick="sendPlayerAct('freeze')">Alternar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Curar Jogador</div><div class="card-sub">Restaura vida para 100</div></div>
-              <button class="btn btn-gold" onclick="sendPlayerAct('heal')">Curar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Dar Dinheiro (Banco)</div><div class="card-sub">Usa o campo Valor/Quantia</div></div>
-              <button class="btn btn-gold" onclick="sendPlayerAct('givebank')">Enviar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Setar Skin</div><div class="card-sub">Aplica o ID da skin do campo Valor</div></div>
-              <button class="btn btn-gold" onclick="sendPlayerAct('setskin')">Aplicar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Setar Nivel</div><div class="card-sub">Atualiza nivel da conta (campo Valor)</div></div>
-              <button class="btn btn-gold" onclick="sendPlayerAct('setlevel')">Aplicar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Kickar Jogador</div><div class="card-sub">Desconecta com motivo</div></div>
-              <button class="btn btn-danger" onclick="sendPlayerAct('kick')">Kick</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Banir Jogador</div><div class="card-sub">Bane conta no banco com motivo</div></div>
-              <button class="btn btn-danger" onclick="sendPlayerAct('ban')">Ban</button>
-            </div>
+          <div class="rail-card">
+            <div class="rail-title"><span>Informacoes do Servidor</span></div>
+            <div class="info-line"><strong>Nome:</strong> Volts RolePlay</div>
+            <div class="info-line"><strong>Plataforma:</strong> open.mp / SA-MP</div>
+            <div class="info-line"><strong>Painel:</strong> Mestre (Nivel 10+)</div>
           </div>
-        </section>
 
-        <section class="sec" id="sec-tp">
-          <div class="grid-actions" id="tpList"></div>
-          <div class="row-form">
-            <div class="field"><label>Coord X</label><input type="number" step="0.01" id="tpX" placeholder="1481.00" /></div>
-            <div class="field"><label>Coord Y</label><input type="number" step="0.01" id="tpY" placeholder="-1771.00" /></div>
-            <div class="field"><label>Coord Z</label><input type="number" step="0.01" id="tpZ" placeholder="18.80" /></div>
-          </div>
-          <button class="btn btn-gold" onclick="sendCustomTp()">Teleportar para Coordenadas</button>
-        </section>
-
-        <section class="sec" id="sec-servidor">
-          <div class="row-form">
-            <div class="field"><label>Anuncio Global / Spawn Veiculo ID</label><input type="text" id="srvInput" placeholder="Ex: 411 ou Mensagem" /></div>
-            <div class="field"><label>Clima (Weather ID)</label><input type="number" id="srvWeather" placeholder="Ex: 1" /></div>
-            <div class="field"><label>Hora (0 a 23)</label><input type="number" id="srvHour" min="0" max="23" placeholder="Ex: 12" /></div>
-          </div>
-          <div class="grid-actions">
-            <div class="card">
-              <div><div class="card-title">Anuncio Global</div><div class="card-sub">Envia aviso dourado no chat geral</div></div>
-              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'announce|' + val('srvInput'))">Anunciar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Spawnar Veiculo</div><div class="card-sub">Cria veiculo pelo modelo no campo</div></div>
-              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'veh|' + val('srvInput'))">Spawnar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Reparar Veiculo</div><div class="card-sub">Repara lataria e motor atual</div></div>
-              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'fixveh|1')">Reparar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Aplicar Clima</div><div class="card-sub">Altera clima global do servidor</div></div>
-              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'weather|' + val('srvWeather'))">Aplicar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Aplicar Hora</div><div class="card-sub">Altera hora mundial (0-23)</div></div>
-              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'time|' + val('srvHour'))">Aplicar</button>
-            </div>
-            <div class="card">
-              <div><div class="card-title">Limpar Chat Geral</div><div class="card-sub">Limpa linhas do chat para todos</div></div>
-              <button class="btn btn-gold" onclick="emitCef('volts:staff_cmd', 'clearchat|1')">Limpar</button>
+          <div class="rail-card">
+            <div class="rail-title"><span>Acoes Rapidas</span></div>
+            <div class="quick-grid">
+              <button class="quick-btn q-green" onclick="cmdAction('weather', '1')">Sol</button>
+              <button class="quick-btn q-red" onclick="cmdAction('time', '0')">Noite</button>
+              <button class="quick-btn q-blue" onclick="cmdAction('clearchat', '1')">Chat</button>
             </div>
           </div>
-        </section>
+        </aside>
       </div>
     </div>
   </div>
 
+  <footer class="footer-bar">
+    <div><span class="key-badge">INSERT</span> Para abrir ou fechar o painel</div>
+    <div>Volts RolePlay • Painel Mestre 👑</div>
+  </footer>
+
   <div class="toast" id="toast"></div>
 
   <script>
-    const TPS = [
-      { id: "ls_pref", city: "Los Santos", name: "Prefeitura", desc: "Pershing Square" },
-      { id: "ls_lspd", city: "Los Santos", name: "Delegacia LSPD", desc: "Commerce / Centro" },
-      { id: "ls_hosp", city: "Los Santos", name: "Hospital Central", desc: "All Saints" },
-      { id: "ls_lixo", city: "Los Santos", name: "Deposito Coletor", desc: "Willowfield" },
-      { id: "sf_centro", city: "San Fierro", name: "Centro de SF", desc: "Downtown San Fierro" },
-      { id: "sf_aero", city: "San Fierro", name: "Aeroporto Easter Bay", desc: "Pista / Terminal SF" },
-      { id: "lv_strip", city: "Las Venturas", name: "The Strip", desc: "Cassinos LV" },
-      { id: "lv_aero", city: "Las Venturas", name: "Aeroporto LV", desc: "Las Venturas Airport" }
+    const TP_POINTS = [
+      { code: "ls_pref", name: "Prefeitura LS", sub: "Los Santos • Pershing Square" },
+      { code: "ls_lspd", name: "Delegacia LSPD", sub: "Los Santos • Centro" },
+      { code: "ls_hosp", name: "Hospital Central", sub: "Los Santos • All Saints" },
+      { code: "ls_lixo", name: "Deposito Coletor", sub: "Los Santos • Willowfield" },
+      { code: "sf_centro", name: "Centro San Fierro", sub: "San Fierro • Downtown" },
+      { code: "sf_aero", name: "Aeroporto SF", sub: "San Fierro • Easter Bay" },
+      { code: "lv_strip", name: "The Strip LV", sub: "Las Venturas • Cassinos" },
+      { code: "lv_aero", name: "Aeroporto LV", sub: "Las Venturas • Deserto" }
     ];
 
-    function val(id) {
+    const logs = [];
+    const startMs = Date.now();
+
+    function valOf(id) {
       const el = document.getElementById(id);
       return el ? String(el.value || "").trim().replace(/\|/g, " ") : "";
     }
@@ -336,56 +809,119 @@
       }
     }
 
+    function pushLog(text) {
+      const hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      logs.unshift(`[${hora}] ${text}`);
+      const box = document.getElementById("logList");
+      if (box) {
+        box.innerHTML = logs.slice(0, 30).map((l) => `<div class="log-entry"><strong>LOG</strong> ${l}</div>`).join("");
+      }
+    }
+
     function showToast(msg) {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.classList.add("open");
-      clearTimeout(showToast._timer);
-      showToast._timer = setTimeout(() => t.classList.remove("open"), 3500);
+      const el = document.getElementById("toast");
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add("open");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("open"), 3600);
     }
 
-    function sendPlayerAct(action) {
-      emitCef("volts:staff_player", `${action}|${val("targetId")}|${val("targetVal")}|${val("targetReason")}`);
+    function switchTab(tab) {
+      document.querySelectorAll(".nav-item[data-tab]").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+      document.querySelectorAll(".tab-pane").forEach((p) => p.classList.toggle("active", p.id === "pane-" + tab));
     }
 
-    function sendCustomTp() {
-      emitCef("volts:staff_tp", `custom|${val("tpX")}|${val("tpY")}|${val("tpZ")}`);
+    function playerAction(act) {
+      const id = valOf("pId");
+      const v = valOf("pVal");
+      const r = valOf("pReason");
+      emitCef("volts:staff_player", `${act}|${id}|${v}|${r}`);
+      pushLog(`Jogador #${id || "?"} -> ${act}`);
     }
 
-    const tpContainer = document.getElementById("tpList");
-    TPS.forEach((tp) => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <div><div class="card-title">${tp.name}</div><div class="card-sub">${tp.city} • ${tp.desc}</div></div>
-        <button class="btn btn-gold">Teleportar</button>
+    function ecoAction(act) {
+      const id = valOf("ecoId");
+      const v = valOf("ecoVal");
+      emitCef("volts:staff_player", `${act}|${id}|${v}|Painel Mestre`);
+      pushLog(`Economia #${id || "?"} -> ${act} (${v || 0})`);
+    }
+
+    function customTp() {
+      const x = valOf("tpX");
+      const y = valOf("tpY");
+      const z = valOf("tpZ");
+      emitCef("volts:staff_tp", `custom|${x}|${y}|${z}`);
+      pushLog(`TP customizado: ${x}, ${y}, ${z}`);
+    }
+
+    function cmdAction(cmd, param) {
+      emitCef("volts:staff_cmd", `${cmd}|${param || ""}`);
+      pushLog(`Comando: ${cmd}`);
+    }
+
+    const tpCards = document.getElementById("tpCards");
+    TP_POINTS.forEach((tp) => {
+      const card = document.createElement("div");
+      card.className = "fn-card";
+      card.innerHTML = `
+        <div><div class="fn-title">${tp.name}</div><div class="fn-sub">${tp.sub}</div></div>
+        <button class="arrow-btn">→</button>
       `;
-      div.querySelector("button").addEventListener("click", () => emitCef("volts:staff_tp", tp.id));
-      tpContainer.appendChild(div);
-    });
-
-    const titles = {
-      jogadores: "Controle de Jogadores",
-      tp: "Teleportes por Cidade",
-      servidor: "Servidor & Veiculos"
-    };
-
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const tab = btn.dataset.tab;
-        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b === btn));
-        document.querySelectorAll(".sec").forEach((s) => s.classList.toggle("active", s.id === "sec-" + tab));
-        document.getElementById("secTitle").textContent = titles[tab] || "Painel Staff";
+      card.querySelector("button").addEventListener("click", () => {
+        emitCef("volts:staff_tp", tp.code);
+        pushLog(`TP -> ${tp.name}`);
       });
+      tpCards.appendChild(card);
     });
 
-    document.getElementById("btnClose").addEventListener("click", () => emitCef("volts:staff_close", "1"));
+    document.querySelectorAll(".nav-item[data-tab]").forEach((btn) => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
+
+    document.querySelectorAll("[data-go]").forEach((btn) => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.go));
+    });
+
+    document.getElementById("btnSairMenu").addEventListener("click", () => emitCef("volts:staff_close", "1"));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Insert") {
+        e.preventDefault();
+        emitCef("volts:staff_close", "1");
+      }
+    });
+
+    setInterval(() => {
+      const seg = Math.floor((Date.now() - startMs) / 1000);
+      const h = String(Math.floor(seg / 3600)).padStart(2, "0");
+      const m = String(Math.floor((seg % 3600) / 60)).padStart(2, "0");
+      const s = String(seg % 60).padStart(2, "0");
+      document.getElementById("statUptime").textContent = `${h}:${m}:${s}`;
+    }, 1000);
 
     if (window.cef && typeof window.cef.on === "function") {
-      window.cef.on("volts:staff_feedback", (_tipo, msg) => showToast(msg));
+      window.cef.on("volts:staff_stats", (raw) => {
+        const p = String(raw || "").split("|");
+        if (p[0]) {
+          document.getElementById("staffName").textContent = p[0];
+          document.getElementById("railStaffName").textContent = p[0];
+          document.getElementById("staffInitial").textContent = p[0].charAt(0).toUpperCase() || "B";
+        }
+        if (p[1]) document.getElementById("staffLevel").textContent = p[1];
+        if (p[2]) document.getElementById("statCash").textContent = "R$ " + Number(p[2] || 0).toLocaleString("pt-BR");
+        if (p[3] && p[4]) document.getElementById("statOnline").textContent = `${p[3]} / ${p[4]}`;
+      });
+
+      window.cef.on("volts:staff_feedback", (_tipo, msg) => {
+        showToast(msg);
+      });
     }
 
     emitCef("volts:staff_ready", "1");
   </script>
 </body>
 </html>
+```[cite: 12]
+
+Quando você colocar esse `staff/index.html` no repositório, o próximo passo é atualizar o **`painel_staff.inc`** para já enviar os dados reais do seu personagem e online do servidor (`volts:staff_stats`) assim que o painel abrir com **INSERT**. Quer que eu já gere esse `painel_staff.inc` atualizado?
